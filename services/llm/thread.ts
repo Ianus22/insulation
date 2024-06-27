@@ -1,4 +1,4 @@
-import { ASSISTANTS, THREAD_START_TEMPLATE, THREAD_TEMPERATURE, THREAD_TIMEOUT, OPENAI } from './openai';
+import { ASSISTANTS, THREAD_TEMPERATURE, THREAD_TIMEOUT, OPENAI } from './openai';
 
 const attachedImages = new Map<string, string>();
 
@@ -33,7 +33,7 @@ async function beginThread(image: File, prompt: string) {
           },
           {
             type: 'text',
-            text: THREAD_START_TEMPLATE(prompt)
+            text: prompt
           }
         ]
       }
