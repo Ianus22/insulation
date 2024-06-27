@@ -14,9 +14,15 @@ const THREAD_START_TEMPLATE = (extraPrompt: string) =>
   What is the best way to insolate and fireproof the area shown in the image?
 `.trim();
 
+const VALIDATOR_TEMPLATE = (extraPrompt: string) =>
+  `${extraPrompt}
+  
+  What is the best way to insolate and fireproof the area shown in the image?
+`.trim();
+
 const ASSISTANTS = {
-  Insulation: 'asst_rhdahtQIBb3N3RsoTGBeIsdX'
+  Insulation: 'asst_rhdahtQIBb3N3RsoTGBeIsdX',
+  Validator: 'asst_hBw3ErAjfIS8izvJqMUc8LMd'
 } as const;
 
-export { OPENAI, THREAD_TIMEOUT, THREAD_TEMPERATURE, THREAD_START_TEMPLATE, ASSISTANTS };
-
+export { OPENAI, THREAD_TIMEOUT, THREAD_TEMPERATURE, THREAD_START_TEMPLATE, VALIDATOR_TEMPLATE, ASSISTANTS };
