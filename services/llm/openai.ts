@@ -10,7 +10,7 @@ const THREAD_TEMPERATURE = 0.3;
 const VALIDATOR_TEMPLATE = (extraPrompt: string) =>
   `${extraPrompt}
   
-  What is the best way to insolate and fireproof the area shown in the image?
+  What is the best way to insolate and fireproof the area shown in the image given the requirements above?
 `.trim();
 
 const ASSISTANTS = {
