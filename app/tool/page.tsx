@@ -1,6 +1,7 @@
 'use client';
 
 import { APICreateThread, APIDeleteThread, APIRunThread } from '@/api/thread';
+import { ValidateImage } from '@/api/validate';
 import React, { useEffect, useRef, useState } from 'react';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
@@ -10,9 +11,11 @@ import Image from 'next/image';
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const [response, setResponse] = useState<string>('');
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState<string>('');
+  const [validatedURL, setValidatedURL] = useState<string | null>(null);
 
   const selectorRef = useRef<HTMLInputElement | null>(null);
 
@@ -28,6 +31,19 @@ const ImageUploadComponent: React.FC = () => {
     const onImageLoaded = () => setImagePreviewUrl(reader.result as string);
 
     reader.addEventListener('load', onImageLoaded, { once: true });
+
+    if (validatedURL == null || validatedURL != imagePreviewUrl) {
+      setIsValidating(true);
+      ValidateImage(image, prompt).then(x => {
+        setIsValidating(false);
+        if (x.is_valid) {
+          setValidatedURL(imagePreviewUrl);
+          setPrompt(x.reworked_prompt);
+        } else {
+          alert(x.reason);
+        }
+      });
+    }
 
     return () => reader.removeEventListener('load', onImageLoaded);
   }, [image]);
@@ -93,4 +109,3 @@ const ImageUploadComponent: React.FC = () => {
   );
 };
 export default ImageUploadComponent;
-
