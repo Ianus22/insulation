@@ -14,6 +14,8 @@ import {
   navigationMenuTriggerStyle
 } from '@/components/ui/navigation-menu';
 import { useState } from 'react';
+import { signOut } from 'next-auth/react';
+
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const toggleMobileMenu = () => {
@@ -67,13 +69,32 @@ export function MyNavbar() {
                   <NavigationMenuLink className={`${navigationMenuTriggerStyle()} text-xl`}>Contact</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
-              <Link href='/tool'>
+              <Link href='/sign-in'>
                 <NavigationMenuItem>
                   <Button variant='outline' className='bg-[#C5ECE0] hover:bg-green-200 text-xl py-2 px-4 square-lg'>
-                    Try out!
+                    Sign in
                   </Button>
                 </NavigationMenuItem>
               </Link>
+              {/* {!session?.user ? (
+                <Link href='/sign-in'>
+                  <NavigationMenuItem>
+                    <Button variant='outline' className='bg-[#C5ECE0] hover:bg-green-200 text-xl py-2 px-4 square-lg'>
+                      Sign in
+                    </Button>
+                  </NavigationMenuItem>
+                </Link>
+              ) : (
+                <NavigationMenuItem>
+                  <Button
+                    variant='outline'
+                    className='bg-[#C5ECE0] hover:bg-green-200 text-xl py-2 px-4 square-lg'
+                    onClick={() => signOut()}
+                  >
+                    Logout
+                  </Button>
+                </NavigationMenuItem>
+              )} */}
             </div>
           </div>
           {isMobileMenuOpen && (
@@ -100,10 +121,10 @@ export function MyNavbar() {
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
-                <Link href='/tool'>
+                <Link href='/sign-in'>
                   <NavigationMenuItem>
                     <Button variant='outline' className='bg-[#C5ECE0] hover:bg-green-200 text-lg py-2 px-4 square-lg'>
-                      Try out!
+                      Sign in
                     </Button>
                   </NavigationMenuItem>
                 </Link>
