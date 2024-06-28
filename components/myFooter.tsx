@@ -14,16 +14,13 @@ const Footer = () => {
           </div>
         </div>
         <div className="space-y-2 md:mr-12 mb-4 p-2 text-right w-full">
-          <a href="#" className="block hover:underline">
-            About us
-          </a>
-          <a href="#" className="block hover:underline">
+          <a href="/how-to-use" className="block hover:underline">
             How to use
           </a>
-          <a href="#" className="block hover:underline">
+          <a href="/donation" className="block hover:underline">
             Donations
           </a>
-          <a href="#" className="block hover:underline">
+          <a href="/tools-used" className="block hover:underline">
             Tools used
           </a>
         </div>
