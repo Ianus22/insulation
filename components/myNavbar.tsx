@@ -34,7 +34,7 @@ export function MyNavbar() {
         setIsSignedIn(false);
       }
     });
-  }, []);
+  });
 
   return (
     <div className='w-full border-b border-gray-300'>
