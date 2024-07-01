@@ -8,6 +8,8 @@ import Footer from '@/components/myFooter';
 import Markdown from 'react-markdown';
 import Image from 'next/image';
 import Spinner from '../../components/ui/Spinner';
+import { firebaseApp } from '@/services/llm/firebase';
+import { getAuth } from 'firebase/auth';
 
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -59,13 +61,14 @@ const ImageUploadComponent: React.FC = () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
 
-    const threadId = await APICreateThread(image, prompt);
+    const threadId: string | null = getAuth().currentUser == null ? await APICreateThread(image, prompt) : 'awd'; //change awd to database request
+
     if (threadId == null) {
       setIsGenerating(false);
       return;
     }
 
-    await APIRunThread(threadId, null, text => setResponse(res => res + text));
+    await APIRunThread(threadId, prompt, text => setResponse(res => res + text));
     setIsGenerating(false);
   };
 
