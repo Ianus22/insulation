@@ -1,14 +1,12 @@
 'use client';
-
-import { APICreateThread, APIDeleteThread, APIRunThread } from '@/api/thread';
-import { ValidateImage } from '@/api/validate';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import Image from 'next/image';
+import Markdown from 'react-markdown';
+import Spinner from '../../components/ui/Spinner';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
-import Markdown from 'react-markdown';
-import Image from 'next/image';
-import Spinner from '../../components/ui/Spinner';
-
+import { ValidateImage } from '@/api/validate';
+import { APICreateThread, APIRunThread } from '@/api/thread';
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -18,21 +16,17 @@ const ImageUploadComponent: React.FC = () => {
   const [response, setResponse] = useState<string>('');
   const [prompt, setPrompt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
-
+  const [dragOver, setDragOver] = useState(false);
   const selectorRef = useRef<HTMLInputElement | null>(null);
-
   useEffect(() => {
     if (image == null) {
       setImagePreviewUrl(null);
       return;
     }
-
     const reader = new FileReader();
     reader.readAsDataURL(image);
-
     const onImageLoaded = () => setImagePreviewUrl(reader.result as string);
     reader.addEventListener('load', onImageLoaded, { once: true });
-
     setIsValidating(true);
     ValidateImage(image, prompt).then(x => {
       setIsValidating(false);
@@ -43,10 +37,23 @@ const ImageUploadComponent: React.FC = () => {
         setErrorMessage(x.reason);
       }
     });
-
     return () => reader.removeEventListener('load', onImageLoaded);
   }, [image, prompt]);
-
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+  };
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setImage(e.dataTransfer.files[0]);
+    }
+  };
   const removeImage = () => {
     setImage(null);
     setImagePreviewUrl(null);
@@ -54,41 +61,37 @@ const ImageUploadComponent: React.FC = () => {
     setIsValidating(false);
     setErrorMessage('');
   };
-
   const submit = async () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
-
     const threadId = await APICreateThread(image, prompt);
     if (threadId == null) {
       setIsGenerating(false);
       return;
     }
-
     await APIRunThread(threadId, null, text => setResponse(res => res + text));
     setIsGenerating(false);
   };
-
   const imageBorderColor = useMemo(() => {
-    return imagePreviewUrl == null || isValidating
+    return dragOver
+      ? 'border-blue-500'
+      : imagePreviewUrl == null || isValidating
       ? 'border-gray-300'
       : isImageValid
       ? 'border-green-300'
       : 'border-red-300';
-  }, [imagePreviewUrl, isImageValid, isValidating]);
-
+  }, [imagePreviewUrl, isImageValid, isValidating, dragOver]);
   const canClickButton = useMemo(
     () => image != null && !isGenerating && isImageValid,
     [image, isGenerating, isImageValid]
   );
-
   return (
     <>
       <MyNavbar />
       <div className='flex flex-col items-center w-full max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-md'>
         <input
           type='file'
-          accept='image/png, image/jpeg, image/jpg'
+          accept='image/png, image/jpeg'
           ref={selectorRef}
           onChange={e => setImage(e.target.files![0])}
           className='hidden'
@@ -96,6 +99,9 @@ const ImageUploadComponent: React.FC = () => {
         <div
           className={`w-full p-8 mb-8 border-2 border-dashed ${imageBorderColor} rounded-lg bg-gray-50 flex flex-col items-center justify-center cursor-pointer`}
           onClick={() => selectorRef.current!.click()}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
           {imagePreviewUrl == null ? (
             <Image src='/images/downloadSign.png' alt='download' height={120} width={120} />
@@ -142,5 +148,4 @@ const ImageUploadComponent: React.FC = () => {
     </>
   );
 };
-
 export default ImageUploadComponent;
