@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { beginThread } from '@/services/llm/thread';
 
-async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) {
   let formData: FormData | null = null;
   try {
     formData = await req.formData();
@@ -18,6 +18,4 @@ async function POST(req: NextRequest) {
 
   return new NextResponse(threadId);
 }
-
-export { POST };
 

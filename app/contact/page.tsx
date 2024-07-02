@@ -1,8 +1,8 @@
 import React from 'react';
-import Map from './Map/Map.tsx';
-import ContactForm from './ContactForm/ContactForm.tsx';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
+import Map from './Map/Map';
+import ContactForm from './ContactForm/ContactForm';
 
 const ContactPage: React.FC = () => {
   return (
