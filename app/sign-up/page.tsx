@@ -6,6 +6,7 @@ import Footer from '@/components/myFooter';
 import { get, ref } from 'firebase/database';
 import { database, firebaseApp, signUp } from '@/services/llm/firebase';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -13,12 +14,16 @@ export default function Signup() {
   const [error, setError] = useState<string | null>(null);
   const [passwordAgain, setPasswordAgain] = useState('');
 
+  const router = useRouter();
+
   const onSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     try {
       const user = await signUp(email, password);
       console.log('User signed up:', user);
+
+      router.push('/');
     } catch (error: any) {
       setError(error.message);
     }
