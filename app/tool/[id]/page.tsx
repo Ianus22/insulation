@@ -25,6 +25,8 @@ const ImageUploadComponent: React.FC = () => {
 
   let textStart: string = '';
 
+  let isImageValidFlag = false;
+
   const selectorRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
     if (image == null) {
@@ -79,13 +81,20 @@ const ImageUploadComponent: React.FC = () => {
     await APIRunThread(threadId, prompt, text => {
       if (textStart.length < 12) {
         textStart += text;
-        if (text.startsWith('Bad Request:')) {
-          setIsImageValid(false);
-          return;
+        if (text.length >= 12) {
+          if (text.startsWith('Bad Request:')) {
+            setIsImageValid(false);
+            isImageValidFlag = false;
+            setIsValidating(false);
+          } else {
+            setIsImageValid(true);
+            isImageValidFlag = true;
+            setIsValidating(false);
+            setResponse(res => res + text);
+          }
         }
-        if (text.length >= 12) setResponse(res => res + text);
       } else {
-        if (isImageValid) setResponse(res => res + text);
+        if (isImageValidFlag) setResponse(res => res + text);
         else setErrorMessage(error => error + text);
       }
     });
