@@ -23,6 +23,8 @@ const ImageUploadComponent: React.FC = () => {
   const [prompt, setPrompt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
+  const { id: threadId } = useParams() as { id: string };
+
   let textStart: string = '';
 
   let isImageValidFlag = false;
@@ -73,8 +75,6 @@ const ImageUploadComponent: React.FC = () => {
   const submit = async () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
-
-    const { id: threadId } = useParams() as { id: string };
 
     console.log(getMessages(threadId));
 
