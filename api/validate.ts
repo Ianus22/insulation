@@ -1,4 +1,6 @@
-import type { ValidatorResponse } from '@/services/llm/validator';
+// import type { ValidatorResponse } from '@/services/llm/validator';
+
+type ValidatorResponse = any;
 
 async function ValidateImage(image: File, prompt: string): Promise<ValidatorResponse> {
   const formData = new FormData();
