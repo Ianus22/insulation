@@ -1,7 +1,6 @@
 'use client';
 
 import { APICreateThread, APIDeleteThread, APIRunThread } from '@/api/thread';
-import { ValidateImage } from '@/api/validate';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
