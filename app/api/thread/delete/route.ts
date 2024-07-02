@@ -1,7 +1,8 @@
+import { createNextRouteHandler } from '@/lib/nextUtils';
 import { NextRequest, NextResponse } from 'next/server';
 import { deleteThread } from '@/services/llm/thread';
 
-async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest) {
   let data: any = null;
   try {
     data = await req.json();
@@ -15,5 +16,5 @@ async function DELETE(req: NextRequest) {
   return new NextResponse();
 }
 
-export { DELETE };
+export default createNextRouteHandler({ DELETE });
 
