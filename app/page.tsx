@@ -10,27 +10,6 @@ const img1 = '/images/img1_.png';
 const sketch = '/images/sketch.png';
 const placeholder = '/images/placeholder.png';
 
-const cards = [
-  {
-    title: 'Card Title 1',
-    name: 'John Doe',
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    imgSrc: { placeholder }
-  },
-  {
-    title: 'Card Title 2',
-    name: 'Jane Smith',
-    text: 'Suspendisse commodo, sapien eget cursus cursus.',
-    imgSrc: { placeholder }
-  },
-  {
-    title: 'Card Title 3',
-    name: 'Alice Johnson',
-    text: 'Vivamus luctus urna sed urna ultricies ac tempor dui sagittis.',
-    imgSrc: { placeholder }
-  }
-];
-
 export default function Home() {
   return (
     <>
@@ -44,7 +23,7 @@ export default function Home() {
             height={800}
             width={800}
             quality={100}
-            className='scale-125 md:scale-75 mb-8'
+            className='scale-125 md:scale-50 mb-8'
           />
         </div>
         <div className='relative z-10 text-center'>
@@ -107,4 +86,3 @@ export default function Home() {
     </>
   );
 }
-
