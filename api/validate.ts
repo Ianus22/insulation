@@ -1,4 +1,4 @@
-import { ValidatorResponse } from '@/services/llm/validator';
+import type { ValidatorResponse } from '@/services/llm/validator';
 
 async function ValidateImage(image: File, prompt: string): Promise<ValidatorResponse> {
   const formData = new FormData();
@@ -16,3 +16,4 @@ async function ValidateImage(image: File, prompt: string): Promise<ValidatorResp
 }
 
 export { ValidateImage };
+
