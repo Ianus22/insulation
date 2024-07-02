@@ -1,8 +1,7 @@
-import { createNextRouteHandler } from '@/lib/nextUtils';
 import { NextRequest, NextResponse } from 'next/server';
 import { runThread } from '@/services/llm/thread';
 
-async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) {
   let data: any = null;
   try {
     data = await req.json();
@@ -20,6 +19,4 @@ async function POST(req: NextRequest) {
 
   return new NextResponse(stream);
 }
-
-export default createNextRouteHandler({ POST });
 

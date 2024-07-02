@@ -1,8 +1,7 @@
 import { resetThreadTimeout } from '@/services/llm/thread';
-import { createNextRouteHandler } from '@/lib/nextUtils';
 import { NextRequest, NextResponse } from 'next/server';
 
-async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) {
   let data: any = null;
   try {
     data = await req.json();
@@ -15,6 +14,4 @@ async function POST(req: NextRequest) {
 
   return new NextResponse();
 }
-
-export default createNextRouteHandler({ POST });
 
