@@ -1,17 +1,17 @@
 'use client';
 
 import { APICreateThread, APIDeleteThread, APIRunThread } from '@/api/thread';
-import { ValidateImage } from '@/api/validate';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
 import Markdown from 'react-markdown';
 import Image from 'next/image';
-import Spinner from '../../components/ui/Spinner';
+import Spinner from '@/components/ui/Spinner';
 import { firebaseApp } from '@/services/llm/firebase';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
-import test from 'node:test';
+import { useParams } from 'next/navigation';
+import { getMessages } from '@/services/llm/thread';
 
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -23,10 +23,9 @@ const ImageUploadComponent: React.FC = () => {
   const [prompt, setPrompt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const selectorRef = useRef<HTMLInputElement | null>(null);
-
   let textStart: string = '';
 
+  const selectorRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
     if (image == null) {
       setImagePreviewUrl(null);
@@ -73,26 +72,9 @@ const ImageUploadComponent: React.FC = () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
 
-    let threadId: string | null = null;
-    const currUser = getAuth().currentUser;
-    if (currUser == null) {
-      threadId = await APICreateThread(image, prompt);
-    } else {
-      await getUser(currUser.uid).then(async user => {
-        if (user != null) {
-          //threadId = await getChats(currUser.uid);//That is bullshit
-          console.log('TODO: Check for max chat capacity');
-        }
+    const { id: threadId } = useParams() as { id: string };
 
-        threadId = await APICreateThread(image, prompt);
-        await createChat(currUser!.uid, threadId!);
-      });
-    }
-
-    if (threadId == null) {
-      setIsGenerating(false);
-      return;
-    }
+    console.log(getMessages(threadId));
 
     await APIRunThread(threadId, prompt, text => {
       if (textStart.length < 12) {
