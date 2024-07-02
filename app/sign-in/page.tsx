@@ -4,11 +4,27 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Footer from '@/components/myFooter';
 import Link from 'next/link';
+import { signIn } from '@/services/llm/firebase';
 
 export default function Signin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const onSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    try {
+      const user = await signIn(email, password);
+      console.log('User signed up:', user);
+
+      router.push('/');
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+
   return (
     <>
       <div className='flex min-h-full flex-1 mt-6 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 rounded-lg shadow-lg max-w-lg mx-auto'>
@@ -72,6 +88,7 @@ export default function Signin() {
               <button
                 disabled={!email || !password}
                 className='disabled:cursor-default  flex w-full justify-center rounded-md bg-[#c5ece5] px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500'
+                onClick={onSignIn}
               >
                 Sign in
               </button>

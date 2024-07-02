@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useMemo } from 'react';
-import Image from 'next/image';
-import Markdown from 'react-markdown';
-import Spinner from '@/components/ui/Spinner';
+import { APICreateThread, APIDeleteThread, APIRunThread } from '@/api/thread';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
-import { APICreateThread, APIRunThread } from '@/frontend-api/thread';
+import Markdown from 'react-markdown';
+import Image from 'next/image';
+import Spinner from '@/components/ui/Spinner';
 import { firebaseApp } from '@/services/llm/firebase';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
-import test from 'node:test';
+import { useParams } from 'next/navigation';
+import { getMessages } from '@/services/llm/thread';
 
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -21,20 +22,22 @@ const ImageUploadComponent: React.FC = () => {
   const [response, setResponse] = useState<string>('');
   const [prompt, setPrompt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [dragOver, setDragOver] = useState(false);
-  const selectorRef = useRef<HTMLInputElement | null>(null);
 
   let textStart: string = '';
 
+  const selectorRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
     if (image == null) {
       setImagePreviewUrl(null);
       return;
     }
+
     const reader = new FileReader();
     reader.readAsDataURL(image);
+
     const onImageLoaded = () => setImagePreviewUrl(reader.result as string);
     reader.addEventListener('load', onImageLoaded, { once: true });
+
     setIsValidating(true);
     const timer = setTimeout(() => {
       setIsValidating(false);
@@ -56,21 +59,7 @@ const ImageUploadComponent: React.FC = () => {
 
     return () => reader.removeEventListener('load', onImageLoaded);
   }, [image, prompt]);
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
-  };
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setImage(e.dataTransfer.files[0]);
-    }
-  };
+
   const removeImage = () => {
     setImage(null);
     setImagePreviewUrl(null);
@@ -78,30 +67,14 @@ const ImageUploadComponent: React.FC = () => {
     setIsValidating(false);
     setErrorMessage('');
   };
+
   const submit = async () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
 
-    let threadId: string | null = null;
-    const currUser = getAuth().currentUser;
-    if (currUser == null) {
-      threadId = await APICreateThread(image, prompt);
-    } else {
-      await getUser(currUser.uid).then(async user => {
-        if (user != null) {
-          //threadId = await getChats(currUser.uid);//That is bullshit
-          console.log('TODO: Check for max chat capacity');
-        }
+    const { id: threadId } = useParams() as { id: string };
 
-        threadId = await APICreateThread(image, prompt);
-        await createChat(currUser!.uid, threadId!);
-      });
-    }
-
-    if (threadId == null) {
-      setIsGenerating(false);
-      return;
-    }
+    console.log(getMessages(threadId));
 
     await APIRunThread(threadId, prompt, text => {
       if (textStart.length < 12) {
@@ -116,29 +89,29 @@ const ImageUploadComponent: React.FC = () => {
         else setErrorMessage(error => error + text);
       }
     });
-
     setIsGenerating(false);
   };
+
   const imageBorderColor = useMemo(() => {
-    return dragOver
-      ? 'border-blue-500'
-      : imagePreviewUrl == null || isValidating
+    return imagePreviewUrl == null || isValidating
       ? 'border-gray-300'
       : isImageValid
       ? 'border-green-300'
       : 'border-red-300';
-  }, [imagePreviewUrl, isImageValid, isValidating, dragOver]);
+  }, [imagePreviewUrl, isImageValid, isValidating]);
+
   const canClickButton = useMemo(
     () => image != null && !isGenerating && isImageValid,
     [image, isGenerating, isImageValid]
   );
+
   return (
     <>
       <MyNavbar />
       <div className='flex flex-col items-center w-full max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-md'>
         <input
           type='file'
-          accept='image/png, image/jpeg'
+          accept='image/png, image/jpeg, image/jpg'
           ref={selectorRef}
           onChange={e => setImage(e.target.files![0])}
           className='hidden'
@@ -146,9 +119,6 @@ const ImageUploadComponent: React.FC = () => {
         <div
           className={`w-full p-8 mb-8 border-2 border-dashed ${imageBorderColor} rounded-lg bg-gray-50 flex flex-col items-center justify-center cursor-pointer`}
           onClick={() => selectorRef.current!.click()}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
         >
           {imagePreviewUrl == null ? (
             <Image src='/images/downloadSign.png' alt='download' height={120} width={120} />
@@ -195,4 +165,5 @@ const ImageUploadComponent: React.FC = () => {
     </>
   );
 };
+
 export default ImageUploadComponent;
