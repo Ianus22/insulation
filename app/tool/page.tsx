@@ -24,6 +24,8 @@ const ImageUploadComponent: React.FC = () => {
   const [dragOver, setDragOver] = useState(false);
   const selectorRef = useRef<HTMLInputElement | null>(null);
 
+  let isImageValidFlag = false;
+
   let textStart: string = '';
 
   useEffect(() => {
@@ -81,6 +83,8 @@ const ImageUploadComponent: React.FC = () => {
   const submit = async () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
+    setIsImageValid(false);
+    setIsValidating(true);
 
     let threadId: string | null = null;
     const currUser = getAuth().currentUser;
@@ -106,13 +110,22 @@ const ImageUploadComponent: React.FC = () => {
     await APIRunThread(threadId, prompt, text => {
       if (textStart.length < 12) {
         textStart += text;
-        if (text.startsWith('Bad Request:')) {
-          setIsImageValid(false);
-          return;
+        if (textStart.length >= 12) {
+          if (textStart.startsWith('Bad Request:')) {
+            setIsImageValid(false);
+            setIsValidating(false);
+            isImageValidFlag = false;
+            console.log('Image is not valid');
+          } else {
+            setIsImageValid(true);
+            setIsValidating(false);
+            isImageValidFlag = true;
+            console.log('Image is valid');
+            setResponse(res => res + textStart);
+          }
         }
-        if (text.length >= 12) setResponse(res => res + text);
       } else {
-        if (isImageValid) setResponse(res => res + text);
+        if (isImageValidFlag) setResponse(res => res + text);
         else setErrorMessage(error => error + text);
       }
     });
