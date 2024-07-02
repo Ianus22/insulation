@@ -23,7 +23,7 @@ export default function Home() {
             height={800}
             width={800}
             quality={100}
-            className='scale-125 md:scale-50 mb-8'
+            className='scale-100 md:scale-75 mb-8'
           />
         </div>
         <div className='relative z-10 text-center'>
