@@ -51,15 +51,6 @@ const ImageUploadComponent: React.FC = () => {
           'What is the best way to insolate and fireproof the area shown in the image given the requirements above?'
         );
     }, 500);
-    /*ValidateImage(image, prompt).then(x => {
-      setIsValidating(false);
-      setIsImageValid(x.is_valid);
-      if (x.is_valid) {
-        setPrompt(x.reworked_prompt);
-      } else {
-        setErrorMessage(x.reason);
-      }
-    });*/
 
     return () => reader.removeEventListener('load', onImageLoaded);
   }, [image, prompt]);
