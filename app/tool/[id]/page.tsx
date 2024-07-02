@@ -1,6 +1,6 @@
 'use client';
 
-import { APICreateThread, APIDeleteThread, APIRunThread } from '@/api/thread';
+import { APICreateThread, APIDeleteThread, APIRunThread } from '@/frontend-api/thread';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
