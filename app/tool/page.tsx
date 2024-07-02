@@ -5,8 +5,8 @@ import Markdown from 'react-markdown';
 import Spinner from '../../components/ui/Spinner';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
-import { ValidateImage } from '@/api/validate';
-import { APICreateThread, APIRunThread } from '@/api/thread';
+import { ValidateImage } from '@/frontend-api/validator';
+import { APICreateThread, APIRunThread } from '@/frontend-api/thread';
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -149,3 +149,4 @@ const ImageUploadComponent: React.FC = () => {
   );
 };
 export default ImageUploadComponent;
+

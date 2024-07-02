@@ -1,7 +1,7 @@
-import { runValidation } from '@/services/llm/validator';
+import { ValidatorResponse, runValidation } from '@/services/llm/validator';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest): Promise<NextResponse<any>> {
+export async function POST(req: NextRequest): Promise<NextResponse<ValidatorResponse>> {
   let formData: FormData | null = null;
   try {
     formData = await req.formData();
