@@ -28,8 +28,6 @@ const ImageUploadComponent: React.FC = () => {
 
   let textStart: string = '';
 
-  let isImageValidFlag = false;
-
   useEffect(() => {
     if (image == null) {
       setImagePreviewUrl(null);
