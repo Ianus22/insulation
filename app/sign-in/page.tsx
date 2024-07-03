@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Footer from '@/components/myFooter';
 import Link from 'next/link';
-import { signIn } from '@/services/llm/firebase';
+import { signIn } from '@/services/fb/firebase';
 
 export default function Signin() {
   const [email, setEmail] = useState('');

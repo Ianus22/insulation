@@ -7,9 +7,9 @@ import Spinner from '@/components/ui/Spinner';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
 import { APICreateThread, APIRunThread } from '@/frontend-api/thread';
-import { firebaseApp } from '@/services/llm/firebase';
+import { firebaseApp } from '@/services/fb/firebase';
 import { getAuth } from 'firebase/auth';
-import { getUser, createChat, getChats } from '@/services/database';
+import { getUser, createChat, getChats } from '@/services/fb/database';
 import test from 'node:test';
 
 const ImageUploadComponent: React.FC = () => {

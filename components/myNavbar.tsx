@@ -14,7 +14,7 @@ import {
   navigationMenuTriggerStyle
 } from '@/components/ui/navigation-menu';
 import { useEffect, useState } from 'react';
-import { auth, firebaseApp, logOut } from '@/services/llm/firebase';
+import { auth, firebaseApp, logOut } from '@/services/fb/firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 

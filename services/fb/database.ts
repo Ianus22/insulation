@@ -1,4 +1,4 @@
-import { firebaseApp } from './llm/firebase';
+import { firebaseApp } from '@/services/fb/firebase';
 import { getDatabase, ref, set, get, update, remove, push } from 'firebase/database';
 
 const database = getDatabase(firebaseApp);
