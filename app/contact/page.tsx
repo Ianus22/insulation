@@ -7,14 +7,13 @@ import ContactForm from './ContactForm/ContactForm';
 const ContactPage: React.FC = () => {
   return (
     <>
-      <MyNavbar/>
+      <MyNavbar />
       <div className='flex flex-col items-center min-h-screen mt-6'>
         <div className='bg-gray-100 shadow-md rounded-lg p-6 w-full max-w-4xl'>
           <h1 className='text-2xl font-semibold text-center text-black'>Get in Touch</h1>
           <div className='flex flex-col md:flex-row justify-between items-center mt-6'>
             <div className='flex flex-col items-start mb-4 md:mb-0 md:mr-4'>
               <div className='flex items-center mb-4'>
-                
                 <svg
                   data-testid='geist-icon'
                   height='16'
@@ -30,7 +29,7 @@ const ContactPage: React.FC = () => {
                     fill='currentColor'
                   ></path>
                 </svg>
-                <span className='ml-2 text-gray-700'>Knöllgasse 23, Wien</span>
+                <span className='ml-2 text-gray-700'>Rienößlgasse 3, Wien</span>
               </div>
               <div className='flex items-center mb-4'>
                 <svg
