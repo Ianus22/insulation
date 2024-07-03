@@ -21,7 +21,6 @@ export default function Signup() {
     setError(null);
     try {
       const user = await signUp(email, password);
-      console.log('User signed up:', user);
 
       router.push('/');
     } catch (error: any) {

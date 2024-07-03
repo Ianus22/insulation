@@ -67,8 +67,6 @@ const ImageUploadComponent: React.FC = () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
 
-    console.log(getMessages(threadId));
-
     await APIRunThread(threadId, prompt, text => {
       if (textStart.length < 12) {
         textStart += text;

@@ -13,6 +13,18 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle
 } from '@/components/ui/navigation-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
+
 import { useEffect, useState } from 'react';
 import { auth, firebaseApp, logOut } from '@/services/llm/firebase';
 import firebase from 'firebase/compat/app';
@@ -37,7 +49,7 @@ export function MyNavbar() {
   });
 
   return (
-    <div className='w-full border-b border-gray-300'>
+    <div className='relative z-50 w-full border-b border-gray-300'>
       <NavigationMenu>
         <NavigationMenuList>
           <div className='flex items-center justify-between p-4 w-full'>
@@ -73,10 +85,8 @@ export function MyNavbar() {
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link href='/donation' legacyBehavior passHref>
-                  <NavigationMenuLink className={`${navigationMenuTriggerStyle()} text-xl`}>
-                    Donation
-                  </NavigationMenuLink>
+                <Link href='/pricing' legacyBehavior passHref>
+                  <NavigationMenuLink className={`${navigationMenuTriggerStyle()} text-xl`}>Pricing</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -94,13 +104,26 @@ export function MyNavbar() {
                 </Link>
               ) : (
                 <NavigationMenuItem>
-                  <Button
-                    variant='outline'
-                    className='bg-[#C5ECE0] hover:bg-green-200 text-xl py-2 px-4 square-lg'
-                    onClick={() => logOut()}
-                  >
-                    Logout
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger className='bg-[#C5ECE0] hover:bg-green-200 text-xl py-2 px-4 square-lg rounded-lg'>
+                      Logout
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>Are you sure you want to log out</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => logOut()}
+                          className='bg-[#C5ECE0] hover:bg-green-200 text-black'
+                        >
+                          Logout
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </NavigationMenuItem>
               )}
             </div>
@@ -116,9 +139,9 @@ export function MyNavbar() {
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <Link href='/donation' legacyBehavior passHref>
+                  <Link href='/pricing' legacyBehavior passHref>
                     <NavigationMenuLink className={`${navigationMenuTriggerStyle()} text-lg`}>
-                      Donation
+                      Pricing
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>

@@ -106,12 +106,10 @@ const ImageUploadComponent: React.FC = () => {
             setIsImageValid(false);
             setIsValidating(false);
             isImageValidFlag = false;
-            console.log('Image is not valid');
           } else {
             setIsImageValid(true);
             setIsValidating(false);
             isImageValidFlag = true;
-            console.log('Image is valid');
             setResponse(res => res + textStart);
           }
         }
