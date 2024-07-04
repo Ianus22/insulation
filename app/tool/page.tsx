@@ -7,10 +7,9 @@ import Spinner from '@/components/ui/Spinner';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
 import { APICreateThread, APIRunThread } from '@/frontend-api/thread';
-import { firebaseApp } from '@/services/llm/firebase';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
-import test from 'node:test';
+import { FaMicrophone } from 'react-icons/fa6';
 
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -42,9 +41,7 @@ const ImageUploadComponent: React.FC = () => {
       setIsValidating(false);
       setIsImageValid(true);
       if (prompt == null || prompt.length == 0)
-        setPrompt(
-          'What is the best way to insolate and fireproof the area shown in the image given the requirements above?'
-        );
+        setPrompt('What is the best way to insulate and fireproof the area shown in the image given above?');
     }, 500);
 
     return () => reader.removeEventListener('load', onImageLoaded);
@@ -168,9 +165,14 @@ const ImageUploadComponent: React.FC = () => {
         <div className='w-full relative mb-8'>
           <textarea
             placeholder='Additional prompt'
-            className='w-full p-4 border border-gray-300 rounded-lg focus:outline-none'
+            className='w-full p-4 border border-gray-300 rounded-lg focus:outline-none pr-10'
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
+          />
+          <FaMicrophone
+            className='absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer'
+            size={32}
+            style={{ color: '#C5ECE0' }}
           />
           {isValidating && (
             <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-75'>

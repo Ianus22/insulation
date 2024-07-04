@@ -47,9 +47,7 @@ const ImageUploadComponent: React.FC = () => {
       setIsValidating(false);
       setIsImageValid(true);
       if (prompt == null || prompt.length == 0)
-        setPrompt(
-          'What is the best way to insolate and fireproof the area shown in the image given the requirements above?'
-        );
+        setPrompt('What is the best way to insulate and fireproof the area shown in the image given above?');
     }, 500);
 
     return () => reader.removeEventListener('load', onImageLoaded);
