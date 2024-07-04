@@ -148,8 +148,10 @@ const ImageUploadComponent: React.FC = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         audioChunksRef.current = [];
         try {
+          setIsValidating(true);
           const transcribedText = await transcribeAudio(audioBlob);
           setPrompt(prev => `${prev} ${transcribedText}`);
+          setIsValidating(false);
         } catch (error) {
           if (error instanceof Error) {
             setErrorMessage(error.message);
@@ -169,6 +171,11 @@ const ImageUploadComponent: React.FC = () => {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
+  };
+
+  const handleAudioButton = () => {
+    if (isRecording) handleAudioStop();
+    else handleAudioStart();
   };
 
   const imageBorderColor = useMemo(() => {
@@ -227,7 +234,10 @@ const ImageUploadComponent: React.FC = () => {
           <FaMicrophone
             className='absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer'
             size={32}
-            style={{ color: '#C5ECE0' }}
+            style={{ color: isRecording ? '#D2122E' : '#C5ECE0' }}
+            // onMouseDown={handleAudioStart}
+            // onMouseUp={handleAudioStop}
+            onClick={handleAudioButton}
           />
           {isValidating && (
             <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-75'>
@@ -242,15 +252,6 @@ const ImageUploadComponent: React.FC = () => {
           onClick={submit}
         >
           Submit
-        </button>
-        <button
-          className={`w-full py-3 mb-8 ${
-            isRecording ? 'bg-red-500' : 'bg-blue-500'
-          } text-white rounded-lg hover:bg-blue-700`}
-          onMouseDown={handleAudioStart}
-          onMouseUp={handleAudioStop}
-        >
-          {isRecording ? 'Recording...' : 'Hold to Record'}
         </button>
         <div className='w-full p-6 border border-gray-300 rounded-lg bg-gray-50'>
           <h2 className='text-black text-lg font-semibold mb-4'>Result</h2>

@@ -13,8 +13,10 @@ export async function POST(req: NextRequest) {
 
   const result = await OPENAI.audio.transcriptions.create({
     file: formData.get('file') as File,
-    model: 'whisper-1'
+    model: 'whisper-1',
+    language: 'en'
   });
 
   return new NextResponse(result.text);
 }
+
