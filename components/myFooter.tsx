@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className='bg-[#d1f2eb] text-[#5d6d7e] mt-10 pt-8'>
+    <footer className='bg-[#d1f2eb] text-[#5d6d7e] pt-8'>
       <div className='container mx-auto flex justify-between items-center'>
         <div className='w-full'>
           <p className='text-lg'>&copy; 2024 SmartInsulation</p>

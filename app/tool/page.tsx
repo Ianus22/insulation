@@ -9,7 +9,8 @@ import Footer from '@/components/myFooter';
 import { APICreateThread, APIRunThread } from '@/frontend-api/thread';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
-import { FaMicrophone } from 'react-icons/fa6';
+import { FaMicrophone } from 'react-icons/fa';
+import { HiOutlineChatBubbleBottomCenterText } from 'react-icons/hi2';
 
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -21,10 +22,11 @@ const ImageUploadComponent: React.FC = () => {
   const [prompt, setPrompt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [dragOver, setDragOver] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [oldChats, setOldChats] = useState<any[]>([]);
   const selectorRef = useRef<HTMLInputElement | null>(null);
 
   let isImageValidFlag = false;
-
   let textStart: string = '';
 
   useEffect(() => {
@@ -46,6 +48,18 @@ const ImageUploadComponent: React.FC = () => {
 
     return () => reader.removeEventListener('load', onImageLoaded);
   }, [image, prompt]);
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      const currUser = getAuth().currentUser;
+      if (currUser) {
+        const chats = await getChats(currUser.uid);
+        setOldChats(chats || []);
+      }
+    };
+    fetchChats();
+  }, []);
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(true);
@@ -81,7 +95,6 @@ const ImageUploadComponent: React.FC = () => {
     } else {
       await getUser(currUser.uid).then(async user => {
         if (user != null) {
-          //threadId = await getChats(currUser.uid);//That is bullshit
           console.log('TODO: Check for max chat capacity');
         }
 
@@ -134,64 +147,94 @@ const ImageUploadComponent: React.FC = () => {
   return (
     <>
       <MyNavbar />
-      <div className='flex flex-col items-center w-full max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-md'>
-        <input
-          type='file'
-          accept='image/png, image/jpeg'
-          ref={selectorRef}
-          onChange={e => setImage(e.target.files![0])}
-          className='hidden'
-        />
-        <div
-          className={`w-full p-8 mb-8 border-2 border-dashed ${imageBorderColor} rounded-lg bg-gray-50 flex flex-col items-center justify-center cursor-pointer`}
-          onClick={() => selectorRef.current!.click()}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          {imagePreviewUrl == null ? (
-            <Image src='/images/downloadSign.png' alt='download' height={120} width={120} />
-          ) : (
-            <Image src={imagePreviewUrl} alt='Uploaded Image' height={120} width={120} />
-          )}
-          <p className='text-gray-400 mt-4'>Drag and drop or click here to upload image</p>
-          {errorMessage && <div className='mt-4 p-3 bg-red-100 text-red-600 rounded'>{errorMessage}</div>}
-          {image && (
-            <button className='mt-4 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-700' onClick={removeImage}>
-              Remove Image
+      <div className='relative flex flex-col items-center justify-center min-h-screen'>
+        <div className='absolute top-4 left-4'>
+          <button onClick={() => setIsSidebarOpen(true)} className='text-gray-700 focus:outline-none'>
+            <HiOutlineChatBubbleBottomCenterText className='text-5xl text-[#c5ece0]' />
+          </button>
+        </div>
+        <div className='flex w-full'>
+          <div
+            className={`absolute top-0 left-0 h-full bg-gray-100 p-4 transition-transform transform ${
+              isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            } z-20`}
+            style={{ width: '250px' }}
+          >
+            <button
+              className='absolute top-2 right-4 hover:bg-green-200 bg-[#c5ece0] text-black p-2 border-2 border-gray-400 rounded-lg'
+              onClick={() => setIsSidebarOpen(false)}
+            >
+              Close
             </button>
-          )}
-        </div>
-        <div className='w-full relative mb-8'>
-          <textarea
-            placeholder='Additional prompt'
-            className='w-full p-4 border border-gray-300 rounded-lg focus:outline-none pr-10'
-            value={prompt}
-            onChange={e => setPrompt(e.target.value)}
-          />
-          <FaMicrophone
-            className='absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer'
-            size={32}
-            style={{ color: '#C5ECE0' }}
-          />
-          {isValidating && (
-            <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-75'>
-              <Spinner />
+            <h2 className='text-xl font-semibold mb-4'>Previous Chats</h2>
+            <ul>
+              {oldChats.map((chat, index) => (
+                <li key={index} className='mb-2 p-2 bg-white rounded shadow'>
+                  {chat.title}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className='flex flex-col items-center w-11/12 max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-md ml-auto z-10'>
+            <input
+              type='file'
+              accept='image/png, image/jpeg'
+              ref={selectorRef}
+              onChange={e => setImage(e.target.files![0])}
+              className='hidden'
+            />
+            <div
+              className={`w-full p-8 mb-8 border-2 border-dashed ${imageBorderColor} rounded-lg bg-gray-50 flex flex-col items-center justify-center cursor-pointer`}
+              onClick={() => selectorRef.current!.click()}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              {imagePreviewUrl == null ? (
+                <Image src='/images/downloadSign.png' alt='download' height={120} width={120} />
+              ) : (
+                <Image src={imagePreviewUrl} alt='Uploaded Image' height={120} width={120} />
+              )}
+              <p className='text-gray-400 mt-4'>Drag and drop or click here to upload image</p>
+              {errorMessage && <div className='mt-4 p-3 bg-red-100 text-red-600 rounded'>{errorMessage}</div>}
+              {image && (
+                <button className='mt-4 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-700' onClick={removeImage}>
+                  Remove Image
+                </button>
+              )}
             </div>
-          )}
-        </div>
-        <button
-          className={`w-full py-3 mb-8 bg-[#C5ECE0] text-black rounded-lg${
-            canClickButton ? ' hover:bg-green-200 cursor-pointer' : ' hover:bg-[#C5ECE0] cursor-default'
-          }`}
-          onClick={submit}
-        >
-          Submit
-        </button>
-        <div className='w-full p-6 border border-gray-300 rounded-lg bg-gray-50'>
-          <h2 className='text-black text-lg font-semibold mb-4'>Result</h2>
-          <div className='w-full p-4 border border-gray-300 rounded-lg bg-white'>
-            <Markdown className='text-gray-400'>{response === '' ? 'Returned result' : response}</Markdown>
+            <div className='w-full relative mb-8'>
+              <textarea
+                placeholder='Additional prompt'
+                className='w-full p-4 border border-gray-300 rounded-lg focus:outline-none pr-10'
+                value={prompt}
+                onChange={e => setPrompt(e.target.value)}
+              />
+              <FaMicrophone
+                className='absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer'
+                size={32}
+                style={{ color: '#C5ECE0' }}
+              />
+              {isValidating && (
+                <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-75'>
+                  <Spinner />
+                </div>
+              )}
+            </div>
+            <button
+              className={`w-full py-3 mb-8 bg-[#C5ECE0] text-black rounded-lg${
+                canClickButton ? ' hover:bg-green-200 cursor-pointer' : ' hover:bg-[#C5ECE0] cursor-default'
+              }`}
+              onClick={submit}
+            >
+              Submit
+            </button>
+            <div className='w-full p-6 border border-gray-300 rounded-lg bg-gray-50'>
+              <h2 className='text-black text-lg font-semibold mb-4'>Result</h2>
+              <div className='w-full p-4 border border-gray-300 rounded-lg bg-white'>
+                <Markdown className='text-gray-400'>{response === '' ? 'Returned result' : response}</Markdown>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -199,4 +242,5 @@ const ImageUploadComponent: React.FC = () => {
     </>
   );
 };
+
 export default ImageUploadComponent;
