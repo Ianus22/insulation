@@ -71,3 +71,4 @@ async function runValidation(image: File, extraPrompt: string): Promise<Validato
 
 export type { ValidatorResponse };
 export { runValidation };
+

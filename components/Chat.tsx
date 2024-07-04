@@ -1,6 +1,6 @@
 'use client';
 
-import { APICreateThread, APIDeleteThread, APIKeepaliveThread, APIRunThread } from '@/api/thread';
+import { APICreateThread, APIDeleteThread, APIKeepaliveThread, APIRunThread } from '@/frontend-api/thread';
 import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 
