@@ -274,7 +274,8 @@ const ImageUploadComponent: React.FC = () => {
               <FaMicrophone
                 className='absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer'
                 size={32}
-                style={{ color: '#C5ECE0' }}
+                onClick={handleAudioButton}
+                style={{ color: isRecording ? '#f01e2c' : '#C5ECE0' }}
               />
               {isValidating && (
                 <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-75'>
