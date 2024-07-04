@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 const Footer = () => {
   return (
@@ -10,7 +11,9 @@ const Footer = () => {
             <FacebookIcon className='w-6 h-6' />
             <LinkedinIcon className='w-6 h-6' />
             <YoutubeIcon className='w-6 h-6' />
-            <InstagramIcon className='w-6 h-6' />
+            <Link href='https://instagram.com/n_krustev_'>
+              <InstagramIcon className='w-6 h-6' />
+            </Link>
           </div>
         </div>
         <div className='space-y-2 md:mr-12 mb-4 p-2 text-right w-full'>
