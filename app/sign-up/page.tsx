@@ -3,11 +3,30 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Footer from '@/components/myFooter';
+import { get, ref } from 'firebase/database';
+import { database, firebaseApp, signUp } from '@/services/llm/firebase';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [passwordAgain, setPasswordAgain] = useState('');
+
+  const router = useRouter();
+
+  const onSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    try {
+      const user = await signUp(email, password);
+
+      router.push('/');
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
 
   return (
     <>
@@ -80,11 +99,14 @@ export default function Signup() {
               <button
                 disabled={!email || !password || !passwordAgain || password !== passwordAgain}
                 className='flex w-full justify-center rounded-md bg-[#c5ece0] px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500'
+                onClick={onSignUp}
               >
                 Sign Up
               </button>
             </div>
           </div>
+          <p className='text-red-500'>{error}</p>
+
           <p className='mt-10 text-center text-sm text-gray-400'>
             Already have an account?&nbsp;
             <Link href='/sign-in' className='font-semibold leading-6 text-indigo-400 hover:text-indigo-300'>

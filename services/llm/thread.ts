@@ -4,6 +4,19 @@ const attachedImages = new Map<string, string>();
 
 const threadTimeouts = new Map<string, NodeJS.Timeout>();
 
+interface Message {
+  id: string;
+  object: string;
+  created_at: number;
+  assistant_id: string | null;
+  thread_id: string;
+  run_id: null;
+  role: 'user' | 'assistant';
+  content: any[];
+  attachments: any[];
+  metadata: any;
+}
+
 function resetThreadTimeout(threadId: string) {
   clearTimeout(threadTimeouts.get(threadId));
 
@@ -86,5 +99,9 @@ async function deleteThread(threadId: string) {
   await OPENAI.beta.threads.del(threadId);
 }
 
-export { resetThreadTimeout, beginThread, runThread, deleteThread };
+async function getMessages(threadId: string): Promise<Message[]> {
+  const threadMessages = await OPENAI.beta.threads.messages.list(threadId);
+  return Object.values(threadMessages);
+}
 
+export { resetThreadTimeout, beginThread, runThread, deleteThread, getMessages };
