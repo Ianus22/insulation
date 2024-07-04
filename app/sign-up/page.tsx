@@ -7,6 +7,7 @@ import { get, ref } from 'firebase/database';
 import { database, firebaseApp, signUp } from '@/services/llm/firebase';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import MyNavbar from '@/components/myNavbar';
 
 export default function Signup() {
   const [email, setEmail] = useState('');

@@ -20,7 +20,7 @@ const Pricing = () => {
               <li>3 free tries</li>
               <li>limited result</li>
             </ul>
-            <button className='mt-6 text-black py-2 px-4 rounded bg-[#c5ece0] mt-20'>Select</button>
+            <button className=' text-black py-2 px-4 rounded bg-[#c5ece0] mt-20'>Select</button>
           </div>
           <div className='flex flex-col bg-white shadow-lg rounded-lg overflow-hidden w-full sm:w-1/3 p-6 flex-1 border'>
             <h3 className='text-xl font-semibold text-gray-900'>Monthly subscription</h3>

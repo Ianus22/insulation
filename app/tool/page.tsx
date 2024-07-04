@@ -7,6 +7,7 @@ import Spinner from '@/components/ui/Spinner';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
 import { APICreateThread, APIRunThread } from '@/frontend-api/thread';
+import { transcribeAudio } from '../api/whisperApi/whisper';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
 import { FaMicrophone } from 'react-icons/fa';
@@ -24,7 +25,10 @@ const ImageUploadComponent: React.FC = () => {
   const [dragOver, setDragOver] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [oldChats, setOldChats] = useState<any[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
   const selectorRef = useRef<HTMLInputElement | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   let isImageValidFlag = false;
   let textStart: string = '';
@@ -47,7 +51,7 @@ const ImageUploadComponent: React.FC = () => {
     }, 500);
 
     return () => reader.removeEventListener('load', onImageLoaded);
-  }, [image, prompt]);
+  }, [image]);
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -64,10 +68,12 @@ const ImageUploadComponent: React.FC = () => {
     e.preventDefault();
     setDragOver(true);
   };
+
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(false);
   };
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(false);
@@ -75,6 +81,7 @@ const ImageUploadComponent: React.FC = () => {
       setImage(e.dataTransfer.files[0]);
     }
   };
+
   const removeImage = () => {
     setImage(null);
     setImagePreviewUrl(null);
@@ -82,6 +89,7 @@ const ImageUploadComponent: React.FC = () => {
     setIsValidating(false);
     setErrorMessage('');
   };
+
   const submit = async () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
@@ -131,6 +139,57 @@ const ImageUploadComponent: React.FC = () => {
 
     setIsGenerating(false);
   };
+
+  const handleAudioStart = () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('Audio recording is not supported in your browser.');
+      return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        audioChunksRef.current = [];
+        try {
+          setIsValidating(true);
+          const transcribedText = await transcribeAudio(audioBlob);
+          setPrompt(prev => `${prev} ${transcribedText}`);
+          setIsValidating(false);
+        } catch (error) {
+          if (error instanceof Error) {
+            setErrorMessage(error.message);
+          } else {
+            setErrorMessage('An unknown error occurred');
+          }
+        }
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    });
+  };
+
+  const handleAudioStop = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const handleAudioButton = () => {
+    if (isRecording) handleAudioStop();
+    else handleAudioStart();
+  };
+
   const imageBorderColor = useMemo(() => {
     return dragOver
       ? 'border-blue-500'
@@ -140,10 +199,12 @@ const ImageUploadComponent: React.FC = () => {
       ? 'border-green-300'
       : 'border-red-300';
   }, [imagePreviewUrl, isImageValid, isValidating, dragOver]);
+
   const canClickButton = useMemo(
     () => image != null && !isGenerating && isImageValid,
     [image, isGenerating, isImageValid]
   );
+
   return (
     <>
       <MyNavbar />
@@ -235,6 +296,27 @@ const ImageUploadComponent: React.FC = () => {
                 <Markdown className='text-gray-400'>{response === '' ? 'Returned result' : response}</Markdown>
               </div>
             </div>
+          </div>
+          <div className='w-full relative mb-8'>
+            <textarea
+              placeholder='Additional prompt'
+              className='w-full p-4 border border-gray-300 rounded-lg focus:outline-none pr-10'
+              value={prompt}
+              onChange={e => setPrompt(e.target.value)}
+            />
+            <FaMicrophone
+              className='absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer'
+              size={32}
+              style={{ color: isRecording ? '#D2122E' : '#C5ECE0' }}
+              // onMouseDown={handleAudioStart}
+              // onMouseUp={handleAudioStop}
+              onClick={handleAudioButton}
+            />
+            {isValidating && (
+              <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-75'>
+                <Spinner />
+              </div>
+            )}
           </div>
         </div>
       </div>
