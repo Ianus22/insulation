@@ -7,6 +7,7 @@ import Spinner from '@/components/ui/Spinner';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
 import { APICreateThread, APIRunThread } from '@/frontend-api/thread';
+import { transcribeAudio } from '../api/whisperApi/whisper';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
 import { FaMicrophone } from 'react-icons/fa6';
@@ -21,7 +22,10 @@ const ImageUploadComponent: React.FC = () => {
   const [prompt, setPrompt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [dragOver, setDragOver] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const selectorRef = useRef<HTMLInputElement | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   let isImageValidFlag = false;
 
@@ -45,15 +49,18 @@ const ImageUploadComponent: React.FC = () => {
     }, 500);
 
     return () => reader.removeEventListener('load', onImageLoaded);
-  }, [image, prompt]);
+  }, [image]);
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(true);
   };
+
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(false);
   };
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(false);
@@ -61,6 +68,7 @@ const ImageUploadComponent: React.FC = () => {
       setImage(e.dataTransfer.files[0]);
     }
   };
+
   const removeImage = () => {
     setImage(null);
     setImagePreviewUrl(null);
@@ -68,6 +76,7 @@ const ImageUploadComponent: React.FC = () => {
     setIsValidating(false);
     setErrorMessage('');
   };
+
   const submit = async () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
@@ -118,6 +127,50 @@ const ImageUploadComponent: React.FC = () => {
 
     setIsGenerating(false);
   };
+
+  const handleAudioStart = () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('Audio recording is not supported in your browser.');
+      return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        audioChunksRef.current = [];
+        try {
+          const transcribedText = await transcribeAudio(audioBlob);
+          setPrompt(prev => `${prev} ${transcribedText}`);
+        } catch (error) {
+          if (error instanceof Error) {
+            setErrorMessage(error.message);
+          } else {
+            setErrorMessage('An unknown error occurred');
+          }
+        }
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    });
+  };
+
+  const handleAudioStop = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
   const imageBorderColor = useMemo(() => {
     return dragOver
       ? 'border-blue-500'
@@ -127,10 +180,12 @@ const ImageUploadComponent: React.FC = () => {
       ? 'border-green-300'
       : 'border-red-300';
   }, [imagePreviewUrl, isImageValid, isValidating, dragOver]);
+
   const canClickButton = useMemo(
     () => image != null && !isGenerating && isImageValid,
     [image, isGenerating, isImageValid]
   );
+
   return (
     <>
       <MyNavbar />
@@ -188,6 +243,15 @@ const ImageUploadComponent: React.FC = () => {
         >
           Submit
         </button>
+        <button
+          className={`w-full py-3 mb-8 ${
+            isRecording ? 'bg-red-500' : 'bg-blue-500'
+          } text-white rounded-lg hover:bg-blue-700`}
+          onMouseDown={handleAudioStart}
+          onMouseUp={handleAudioStop}
+        >
+          {isRecording ? 'Recording...' : 'Hold to Record'}
+        </button>
         <div className='w-full p-6 border border-gray-300 rounded-lg bg-gray-50'>
           <h2 className='text-black text-lg font-semibold mb-4'>Result</h2>
           <div className='w-full p-4 border border-gray-300 rounded-lg bg-white'>
@@ -200,3 +264,4 @@ const ImageUploadComponent: React.FC = () => {
   );
 };
 export default ImageUploadComponent;
+
