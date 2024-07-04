@@ -297,27 +297,6 @@ const ImageUploadComponent: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className='w-full relative mb-8'>
-            <textarea
-              placeholder='Additional prompt'
-              className='w-full p-4 border border-gray-300 rounded-lg focus:outline-none pr-10'
-              value={prompt}
-              onChange={e => setPrompt(e.target.value)}
-            />
-            <FaMicrophone
-              className='absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer'
-              size={32}
-              style={{ color: isRecording ? '#D2122E' : '#C5ECE0' }}
-              // onMouseDown={handleAudioStart}
-              // onMouseUp={handleAudioStop}
-              onClick={handleAudioButton}
-            />
-            {isValidating && (
-              <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-75'>
-                <Spinner />
-              </div>
-            )}
-          </div>
         </div>
       </div>
       <Footer />
