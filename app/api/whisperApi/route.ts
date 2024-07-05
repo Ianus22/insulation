@@ -17,6 +17,17 @@ export async function POST(req: NextRequest) {
     language: 'en'
   });
 
-  return new NextResponse(result.text);
+  try {
+    const result = await OPENAI.audio.transcriptions.create({
+      file,
+      model: 'whisper-1',
+      language: 'en'
+    });
+
+    return new NextResponse(result.text);
+  } catch (error) {
+    console.error('Error processing transcription:', error);
+    return new NextResponse('Internal Server Error', { status: 500 });
+  }
 }
 
