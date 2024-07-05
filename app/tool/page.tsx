@@ -216,7 +216,7 @@ const ImageUploadComponent: React.FC = () => {
   return (
     <>
       <MyNavbar />
-      <div className='relative flex flex-col items-center justify-center min-h-screen'>
+      <div className='relative flex flex-col items-center justify-center h-1/2'>
         <div className='absolute top-4 left-4'>
           <button onClick={() => setIsSidebarOpen(true)} className='text-gray-700 focus:outline-none'>
             <HiOutlineChatBubbleBottomCenterText className='text-5xl text-[#c5ece0]' />
@@ -276,33 +276,35 @@ const ImageUploadComponent: React.FC = () => {
           </div>
           <div
             className={`flex flex-col items-center ${
-              showOldChat ? 'w-full max-w-full h-screen  ' : 'w-11/12 max-w-2xl'
+              showOldChat
+                ? `w-full max-w-full h-screen border border-gray-200 ${isSidebarOpen ? 'md:ml-64' : ''}`
+                : 'w-11/12 max-w-2xl'
             }  mx-auto p-8 rounded-lg shadow-md ml-auto`}
           >
             {showOldChat ? (
               <>
-                <div className='ml-auto'>
-                  <div className='flex flex-col space-y-4 items-end '>
+                <div className='ml-auto md:ml-auto'>
+                  <div className='flex flex-col space-y-4 items-end'>
                     <div className='relative'>
                       <Image
                         src={placeholder}
-                        alt='placeholder  '
-                        width={220}
-                        height={200}
+                        alt='placeholder'
+                        width={180}
+                        height={150}
                         className='rounded-lg shadow-lg border border-black'
                       />
                     </div>
-                    <div className='bg-[#c5ece0] p-4 rounded-md border border-black'>
-                      <h1 className=''>Chat1-Prompt</h1>
+                    <div className='bg-[#c5ece0] p-2 md:p-4 rounded-md border border-black'>
+                      <h1>Chat1-Prompt</h1>
                     </div>
                   </div>
                 </div>
-                <div className={`mr-auto ${isSidebarOpen ? 'md:ml-56' : 'ml-0'}`}>
-                  <div className='bg-gray-200  p-4 rounded-md border border-black'>
-                    <h1 className=''>Chat1-Result</h1>
+                <div className='mr-auto md:mr-auto'>
+                  <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black'>
+                    <h1>Chat1-Result</h1>
                   </div>
                 </div>
-                <div className='flex  mt-auto space-x-2 w-full md:w-3/5 items-end ml-auto'>
+                <div className='flex mt-auto space-x-2 w-full items-end'>
                   <input
                     type='text'
                     placeholder='Type your message here...'
