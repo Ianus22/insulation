@@ -55,18 +55,14 @@ export function MyNavbar() {
                   </div>
                   <div className='ml-4 flex items-center'>
                     <h1 className='text-xl md:text-3xl text-slate-950 font-bold'>SmartInsulation</h1>
-                    <div className='block md:hidden ml-2'></div>
                   </div>
                 </div>
               </Link>
-              <div className='mr-2'>
-                <LanguageToggle /> {/* Add LanguageToggle here for mobile */}
-              </div>
             </div>
             <div className='hidden md:flex items-center space-x-4'>
               <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl'>How to use?</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl ml-6'>How to use?</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -114,9 +110,14 @@ export function MyNavbar() {
                   </AlertDialog>
                 </NavigationMenuItem>
               )}
-              <LanguageToggle /> {/* Keep LanguageToggle here for desktop */}
+              <div className='mr-2'>
+                <LanguageToggle /> {/* Move LanguageToggle here for desktop */}
+              </div>
             </div>
-            <div className='block md:hidden'>
+            <div className='flex items-center md:hidden'>
+              <div className='mr-2'>
+                <LanguageToggle /> {/* Move LanguageToggle here for mobile */}
+              </div>
               <button onClick={toggleMobileMenu} className='text-gray-700 focus:outline-none'>
                 <svg
                   className='w-6 h-6'
