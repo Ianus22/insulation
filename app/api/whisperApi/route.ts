@@ -11,8 +11,11 @@ export async function POST(req: NextRequest) {
 
   if (formData == null) return new NextResponse('Invalid body.', { status: 400 });
 
-  const file = formData.get('file') as File;
-  if (!file) return new NextResponse('File is required.', { status: 400 });
+  const result = await OPENAI.audio.transcriptions.create({
+    file: formData.get('file') as File,
+    model: 'whisper-1',
+    language: 'en'
+  });
 
   try {
     const result = await OPENAI.audio.transcriptions.create({
@@ -27,3 +30,4 @@ export async function POST(req: NextRequest) {
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
+
