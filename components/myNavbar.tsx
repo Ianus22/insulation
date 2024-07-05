@@ -29,6 +29,7 @@ import { useEffect, useState } from 'react';
 import { auth, firebaseApp, logOut } from '@/services/llm/firebase';
 import { useRouter } from 'next/navigation';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import LanguageToggle from '@/components/languageToggle'; // Import the LanguageToggle component
 
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -47,7 +48,7 @@ export function MyNavbar() {
         setIsSignedIn(false);
       }
     });
-  });
+  }, []);
 
   return (
     <div className='relative z-50 w-full border-b border-gray-300'>
@@ -64,7 +65,7 @@ export function MyNavbar() {
                 </div>
               </div>
             </Link>
-            <div className='block md:hidden'>
+            <div className='block md:hidden ml-4'>
               <button onClick={toggleMobileMenu} className='text-gray-700 focus:outline-none'>
                 <svg
                   className='w-6 h-6 ml-28 sm:ml-6 mt-2'
@@ -77,7 +78,7 @@ export function MyNavbar() {
                 </svg>
               </button>
             </div>
-            <div className='hidden md:flex justify-end space-x-4 ml-8'>
+            <div className='hidden md:flex items-center space-x-4 ml-8'>
               <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
                   <NavigationMenuLink className={`${navigationMenuTriggerStyle()} text-xl`}>
@@ -130,6 +131,7 @@ export function MyNavbar() {
                   </AlertDialog>
                 </NavigationMenuItem>
               )}
+              <LanguageToggle /> {/* Move the LanguageToggle component here */}
             </div>
           </div>
           {isMobileMenuOpen && (
@@ -156,13 +158,42 @@ export function MyNavbar() {
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
-                <Link href='/sign-in'>
+                {!isSignedIn ? (
+                  <Link href='/sign-in'>
+                    <NavigationMenuItem>
+                      <Button variant='outline' className='bg-[#C5ECE0] hover:bg-green-200 text-lg py-2 px-4 square-lg'>
+                        Sign in
+                      </Button>
+                    </NavigationMenuItem>
+                  </Link>
+                ) : (
                   <NavigationMenuItem>
-                    <Button variant='outline' className='bg-[#C5ECE0] hover:bg-green-200 text-lg py-2 px-4 square-lg'>
-                      Sign in
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger className='bg-[#C5ECE0] hover:bg-green-200 text-lg py-2 px-4 square-lg rounded-lg'>
+                        Logout
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>Are you sure you want to log out</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => {
+                              logOut();
+                              router.refresh();
+                            }}
+                            className='bg-[#C5ECE0] hover:bg-green-200 text-black'
+                          >
+                            Logout
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </NavigationMenuItem>
-                </Link>
+                )}
+                <LanguageToggle /> {/* Move the LanguageToggle component here for mobile */}
               </div>
             </div>
           )}
@@ -171,6 +202,7 @@ export function MyNavbar() {
     </div>
   );
 }
+
 const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWithoutRef<'a'>>(
   ({ className, title, children, ...props }, ref) => {
     return (
