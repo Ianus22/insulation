@@ -43,7 +43,7 @@ export function MyNavbar() {
   }, []);
 
   return (
-    <div className='relative z-50 w-full border-b border-gray-300'>
+    <div className='flex z-50 w-full border-b border-gray-300'>
       <NavigationMenu>
         <NavigationMenuList>
           <div className='flex items-center justify-between p-4 w-full'>
