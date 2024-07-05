@@ -27,12 +27,13 @@ import {
 
 import { useEffect, useState } from 'react';
 import { auth, firebaseApp, logOut } from '@/services/llm/firebase';
-import firebase from 'firebase/compat/app';
+import { useRouter } from 'next/navigation';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const router = useRouter();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
@@ -116,7 +117,10 @@ export function MyNavbar() {
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => logOut()}
+                          onClick={() => {
+                            logOut();
+                            router.refresh();
+                          }}
                           className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                         >
                           Logout

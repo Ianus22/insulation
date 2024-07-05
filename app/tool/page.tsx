@@ -51,6 +51,7 @@ const ImageUploadComponent: React.FC = () => {
     }, 500);
 
     return () => reader.removeEventListener('load', onImageLoaded);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [image]);
 
   useEffect(() => {
@@ -236,7 +237,7 @@ const ImageUploadComponent: React.FC = () => {
               ))}
             </ul>
           </div>
-          <div className='flex flex-col items-center w-11/12 max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-md ml-auto z-10'>
+          <div className='flex flex-col items-center w-11/12 max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-md ml-auto mt-16'>
             <input
               type='file'
               accept='image/png, image/jpeg'
