@@ -22,8 +22,9 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { useEffect, useState } from 'react';
-import { auth, logOut } from '@/services/llm/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { auth, firebaseApp, logOut } from '@/services/firebase';
+import firebase from 'firebase/compat/app';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import LanguageToggle from '@/components/languageToggle';
 
 export function MyNavbar() {
@@ -209,3 +210,4 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
 );
 ListItem.displayName = 'ListItem';
 export default MyNavbar;
+

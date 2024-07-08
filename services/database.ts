@@ -1,12 +1,7 @@
-import { firebaseApp } from './llm/firebase';
+import { firebaseApp } from './firebase';
 import { getDatabase, ref, set, get, update, remove, push } from 'firebase/database';
 
 const database = getDatabase(firebaseApp);
-
-export interface ChatData {
-  threadId: string;
-  isPresent: true;
-}
 
 // Using set (overwrites data at the specified location)
 export const createChat = async (uId: string, chatName: string) => {
@@ -21,8 +16,8 @@ export const createChat = async (uId: string, chatName: string) => {
   await set(newItemRef, data);
 };*/
 
-export const getUser = async (name: string): Promise<any> => {
-  const dbRef = ref(database, `Users/${name}`);
+export const getUser = async (uId: string): Promise<any> => {
+  const dbRef = ref(database, `Users/${uId}`);
   const snapshot = await get(dbRef);
   if (snapshot.exists()) {
     return snapshot.val();
@@ -41,14 +36,16 @@ export const getChatId = async (uId: string, name: string): Promise<string | nul
   }
 };
 
-export const getChats = async (uId: string): Promise<ChatData[] | null> => {
+export const getChats = async (uId: string): Promise<Record<string, string> | null> => {
   const dbRef = ref(database, `Users/${uId}/Chats`);
   const snapshot = await get(dbRef);
   if (snapshot.exists()) {
     const data = snapshot.val();
-    const result: ChatData[] = Object.values(data);
-    return result;
+    console.log(data);
+    return data;
   } else {
+    console.log('User does not have chats');
+    await createChat(uId, 'test');
     return null;
   }
 };
@@ -67,3 +64,4 @@ const deleteUser = async (uId: string) => {
   const dbRef = ref(database, `Users/${uId}`);
   await remove(dbRef);
 };
+

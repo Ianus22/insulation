@@ -6,12 +6,20 @@ import Markdown from 'react-markdown';
 import Spinner from '@/components/ui/Spinner';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
-import { APICreateThread, APIRunThread } from '@/frontend-api/thread';
+import { APICreateThread, APIGetThread, APIRunThread } from '@/frontend-api/thread';
 import { transcribeAudio } from '../api/whisperApi/whisper';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
-import { FaMicrophone } from 'react-icons/fa';
+import { FaMicrophone } from 'react-icons/fa6';
+import { useRouter } from 'next/navigation';
+import { auth } from '@/services/firebase';
 import { HiOutlineChatBubbleBottomCenterText } from 'react-icons/hi2';
+import { error } from 'console';
+
+interface ChatData {
+  imageId: string;
+  texts: string[];
+}
 
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -24,17 +32,27 @@ const ImageUploadComponent: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [dragOver, setDragOver] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [oldChats, setOldChats] = useState<any[]>([]);
+  const [oldChats, setOldChats] = useState<Record<string, string>>({});
   const [isRecording, setIsRecording] = useState(false);
   const [selectedChat, setSelectedChat] = useState<any | null>(null);
   const [showOldChat, setShowOldChat] = useState(false);
+  const [chatData, setChatData] = useState<ChatData | null>(null);
   const selectorRef = useRef<HTMLInputElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const placeholder = '/images/placeholder.png';
 
+  const router = useRouter();
+
+  const threadId = useRef<string | null>(null);
+
   let isImageValidFlag = false;
   let textStart: string = '';
+
+  useEffect(() => {
+    if (auth.currentUser != null) return;
+    router.push('/sign-up');
+  }, []);
 
   useEffect(() => {
     if (image == null) {
@@ -59,11 +77,12 @@ const ImageUploadComponent: React.FC = () => {
 
   useEffect(() => {
     const fetchChats = async () => {
+      console.log('fetching chats');
       const currUser = getAuth().currentUser;
-      if (currUser) {
+      if (currUser != null) {
         const chats = await getChats(currUser.uid);
-        setOldChats(chats || []);
-      }
+        setOldChats(chats || {});
+      } else console.log('User is null');
     };
     fetchChats();
   }, []);
@@ -95,52 +114,36 @@ const ImageUploadComponent: React.FC = () => {
   };
 
   const submit = async () => {
-    if (!canClickButton || !image) return;
+    const isFirstMessage = threadId.current == null;
+
+    console.log('submiting');
+
+    if (threadId.current == null) {
+      console.log('thread is null');
+      if (!canClickButton || !image) return;
+
+      threadId.current = await APICreateThread(image, prompt);
+      if (getAuth().currentUser != null) createChat(getAuth().currentUser!.uid, threadId.current!);
+    } else {
+      console.log('thread is not null');
+      chatData?.texts.push(prompt);
+    }
     setIsGenerating(true);
     setIsImageValid(false);
     setIsValidating(true);
 
-    let threadId: string | null = null;
-    const currUser = getAuth().currentUser;
-    if (currUser == null) {
-      threadId = await APICreateThread(image, prompt);
-    } else {
-      await getUser(currUser.uid).then(async user => {
-        if (user != null) {
-          console.log('TODO: Check for max chat capacity');
-        }
-
-        threadId = await APICreateThread(image, prompt);
-        await createChat(currUser!.uid, threadId!);
-      });
-    }
-
-    if (threadId == null) {
+    if (threadId == null || threadId.current == null) {
+      console.log('Thread is somehow null');
       setIsGenerating(false);
       return;
     }
 
-    await APIRunThread(threadId, prompt, text => {
-      if (textStart.length < 12) {
-        textStart += text;
-        if (textStart.length >= 12) {
-          if (textStart.startsWith('Bad Request:')) {
-            setIsImageValid(false);
-            setIsValidating(false);
-            isImageValidFlag = false;
-          } else {
-            setIsImageValid(true);
-            setIsValidating(false);
-            isImageValidFlag = true;
-            setResponse(res => res + textStart);
-          }
-        }
-      } else {
-        if (isImageValidFlag) setResponse(res => res + text);
-        else setErrorMessage(error => error + text);
-      }
+    console.log('submiting prompt');
+    await APIRunThread(threadId.current, isFirstMessage ? null : prompt, text => {
+      onTextCollected(text);
     });
 
+    console.log('result over');
     setIsGenerating(false);
   };
 
@@ -189,13 +192,34 @@ const ImageUploadComponent: React.FC = () => {
     }
   };
 
+  function onTextCollected(text: string) {
+    if (textStart.length < 12) {
+      textStart += text;
+      if (textStart.length >= 12) {
+        if (textStart.startsWith('Bad Request:')) {
+          setIsImageValid(false);
+          setIsValidating(false);
+          isImageValidFlag = false;
+        } else {
+          setIsImageValid(true);
+          setIsValidating(false);
+          isImageValidFlag = true;
+          setResponse(res => res + textStart);
+        }
+      }
+    } else {
+      if (isImageValidFlag) setResponse(res => res + text);
+      else setErrorMessage(error => error + text);
+    }
+  }
+
   const handleAudioButton = () => {
     if (isRecording) handleAudioStop();
     else handleAudioStart();
   };
 
   const loadChat = async (chatId: string) => {
-    // Fetch and display the chat data using the chatId
+    setChatData(await APIGetThread(chatId));
   };
 
   const imageBorderColor = useMemo(() => {
@@ -236,43 +260,34 @@ const ImageUploadComponent: React.FC = () => {
               Close
             </button>
             <h2 className='text-xl font-semibold mb-4'>Previous Chats</h2>
-            <ul>
-              {oldChats.map((chat, index) => (
-                <li
-                  key={index}
-                  className={`mb-2 p-2 bg-white rounded shadow cursor-pointer ${
-                    selectedChat?.id === chat.id ? 'bg-green-100' : ''
-                  }`}
-                >
-                  <div
-                    onClick={() => {
-                      setSelectedChat(chat);
-                      loadChat(chat.id);
-                    }}
-                  >
-                    {chat.title}
-                  </div>
-                  <button
-                    className='mt-2 py-1 px-3 bg-blue-500 text-white rounded hover:bg-blue-700'
-                    onClick={() => loadChat(chat.id)}
-                  >
-                    Open Chat
-                  </button>
-                </li>
-              ))}
-            </ul>
+
             <button
               className='w-full mt-4 py-2 px-4 hover:bg-green-200 bg-[#c5ece0] text-black p-2 border-2 border-gray-400 rounded-lg'
-              onClick={() => setShowOldChat(false)}
+              onClick={() => {
+                threadId.current = null;
+                setSelectedChat(null);
+                setShowOldChat(false);
+              }}
             >
               New Chat
             </button>
-            <button
-              className='w-full mt-4 py-2 px-4 hover:bg-green-200 bg-gray-200 text-black p-2 border-2 border-gray-400 rounded-lg'
-              onClick={() => setShowOldChat(true)}
-            >
-              Old Chat1
-            </button>
+
+            <ul>
+              {Object.keys(oldChats).map((chatId, i) => (
+                <button
+                  key={i}
+                  className='w-full mt-4 py-2 px-4 hover:bg-green-200 bg-gray-200 text-black p-2 border-2 border-gray-400 rounded-lg'
+                  onClick={() => {
+                    setSelectedChat(chatId);
+                    threadId.current = chatId;
+                    loadChat(chatId);
+                    setShowOldChat(true);
+                  }}
+                >
+                  {oldChats[chatId]}
+                </button>
+              ))}
+            </ul>
           </div>
           <div
             className={`flex flex-col items-center ${
@@ -283,128 +298,59 @@ const ImageUploadComponent: React.FC = () => {
           >
             {showOldChat ? (
               <>
+                {/*Base Image*/}
                 <div className='ml-auto md:ml-auto'>
                   <div className='flex flex-col space-y-4 items-end'>
                     <div className='relative'>
-                      <Image
-                        src={placeholder}
+                      <img
+                        src={`/api/thread/image/${chatData?.imageId}`}
                         alt='placeholder'
                         width={180}
                         height={150}
                         className='rounded-lg shadow-lg border border-black w-24 md:w-52'
                       />
                     </div>
-                    <div className='bg-[#c5ece0] p-2 md:p-4 rounded-md border border-black'>
-                      <h1>Chat1-Prompt</h1>
+                  </div>
+                </div>
+                <div className='ml-auto md:ml-auto'>
+                  {chatData?.texts.map((x, i) => (
+                    <div key={i}>
+                      {/*User's messages*/}
+                      {i % 2 == 0 && (
+                        <div className='flex flex-col space-y-4 items-end'>
+                          <div className='bg-[#c5ece0] p-2 md:p-4 rounded-md border border-black'>
+                            <h1>{x}</h1>
+                          </div>
+                        </div>
+                      )}
+
+                      {/*AI's responses*/}
+                      {i % 2 == 1 && (
+                        <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black'>
+                          <h1>{x}</h1>
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  ))}
+
+                  {/*Current responce*/}
+                  {response.length > 0 && (
+                    <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black'>
+                      <h1>{response}</h1>
+                    </div>
+                  )}
                 </div>
-                <div className='mr-auto md:mr-auto flex-grow'>
-                  <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black mb-5 mt-4'>
-                    <h1>
-                      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Itaque corporis veniam sequi tenetur et
-                      cupiditate officiis illo pariatur esse aperiam enim incidunt necessitatibus asperiores ut
-                      obcaecati harum porro eius blanditiis, provident, omnis quod sunt accusamus. Rem sequi officia
-                      nisi excepturi vero in tenetur amet pariatur corporis provident quasi natus dolore enim
-                      voluptatibus reiciendis temporibus dolorem beatae eveniet ad, aliquid facere laborum maiores ullam
-                      voluptatum? Quia debitis laboriosam distinctio rerum in error est, aspernatur, omnis quae
-                      repudiandae quas, aut iste sed dolorum eos cupiditate dignissimos aliquam sit a! Praesentium
-                      cumque quidem odit, vitae unde magnam accusantium vel, cum non id doloribus. Lorem ipsum dolor sit
-                      amet consectetur adipisicing elit. Iure natus deleniti dolores repellendus fugiat deserunt, ad
-                      quibusdam eos praesentium inventore iusto exercitationem! Enim corrupti mollitia quas ipsam
-                      consectetur dignissimos amet praesentium ex. Placeat pariatur iure ratione explicabo ullam maxime
-                      molestiae dolores. Itaque a corporis provident tenetur incidunt fugit earum ipsum, cumque ad
-                      expedita asperiores quisquam modi voluptatibus fuga nihil. Sunt provident eos, iusto cupiditate
-                      suscipit cumque deserunt delectus veniam voluptate tempore ab eius quasi molestiae sed vitae
-                      aliquam dolores modi quisquam in praesentium nam voluptatem amet. Deserunt asperiores placeat iure
-                      provident amet magnam officia, rerum ipsum possimus iusto animi voluptates distinctio inventore
-                      explicabo ab accusantium ex! Architecto inventore quis dolores culpa aperiam delectus enim
-                      cupiditate fugiat quia reprehenderit ut perferendis totam, quisquam, eos nesciunt, a tempore!
-                      Facere maxime dolor amet quisquam obcaecati aperiam sint corporis mollitia, quia dolore provident
-                      corrupti nobis, vero cupiditate et quas possimus laborum. Nisi ea molestiae praesentium et
-                      quibusdam, repellat consectetur assumenda maxime minus dolor quasi sapiente esse eveniet odit
-                      soluta commodi vitae qui laborum dolores voluptatibus ab atque suscipit iste similique. Saepe vero
-                      nihil illo ea tempora quae nostrum, quis quibusdam dolorem voluptatum doloribus quam quidem
-                      consequuntur consequatur modi eligendi molestias porro exercitationem minima cum facilis ab harum.
-                      Libero, totam delectus? Recusandae soluta explicabo error, esse qui officiis harum molestias
-                      beatae vitae itaque facilis consequuntur obcaecati provident dignissimos autem fuga minima porro
-                      illum exercitationem eligendi aspernatur nobis velit vel ullam. Doloremque, necessitatibus,
-                      voluptates minima delectus aliquam tempore laudantium magni eum magnam possimus iusto impedit
-                      architecto esse placeat distinctio enim, rem laboriosam reiciendis? Dolorem, eius sed aliquam
-                      aperiam, alias necessitatibus hic, sint nihil optio ad expedita eligendi quam odit? Fugit
-                      perferendis adipisci natus pariatur illo consequatur aliquam corrupti excepturi dolorum ipsam
-                      quibusdam repellat animi, amet consectetur quia, suscipit architecto facilis temporibus ducimus
-                      commodi aut quis ad aliquid. Asperiores aliquid eaque deleniti doloribus in nemo omnis odit
-                      quisquam facere veniam fugiat saepe mollitia, numquam deserunt quibusdam exercitationem, quis sit,
-                      officia accusantium et magnam esse non id? Quas modi fugiat qui repudiandae, consequatur
-                      necessitatibus excepturi nulla labore in maxime a accusamus asperiores eveniet numquam
-                      perspiciatis reprehenderit deleniti provident, ipsa nostrum! Architecto vitae pariatur sint facere
-                      neque ad facilis nemo autem reiciendis quis eius minima inventore exercitationem totam atque ipsum
-                      molestias magni, enim qui quisquam eligendi possimus deleniti repellat vel? Enim delectus cumque
-                      pariatur ducimus sed, nihil molestiae obcaecati omnis dolor. Neque alias modi eos! Quas velit
-                      minus placeat ullam nam iusto quisquam, reiciendis quia inventore sint maxime sapiente temporibus
-                      corrupti. Quae, sequi? Libero excepturi explicabo repellat consequuntur esse sit, doloremque
-                      corporis, ducimus qui illum culpa enim! Deserunt distinctio eligendi voluptatibus aperiam
-                      reiciendis nobis aspernatur ea iste possimus, fuga in, consectetur corporis illum quidem
-                      voluptatum dicta nam accusantium asperiores exercitationem? Nobis voluptate accusantium maxime,
-                      numquam quod vero expedita distinctio excepturi at est delectus eius voluptatibus voluptates
-                      corrupti. Accusamus dignissimos quisquam temporibus! Eligendi, nisi adipisci esse nesciunt
-                      voluptatum, magnam autem quae est harum, accusantium architecto iure ratione repellendus
-                      temporibus earum tempora eos reiciendis exercitationem a voluptate enim necessitatibus?
-                      Necessitatibus cum dolores molestias accusamus in, impedit dolore assumenda eos sit! Repudiandae,
-                      doloribus amet voluptate nisi voluptas inventore sint delectus dolorum optio voluptatum distinctio
-                      ipsa officiis a magni iste quos, nihil sapiente laudantium? Possimus fugit a, deleniti beatae
-                      quisquam ex consequatur provident eveniet maxime? Et, delectus iusto cupiditate quasi sint
-                      dolorum. Quasi, repudiandae at ut quod consectetur maxime mollitia quae, ullam labore distinctio
-                      reiciendis tempora praesentium dolor corporis ducimus, cumque vel aut nihil! Harum itaque ut porro
-                      provident. Sit, minima recusandae laborum fugit magni nisi voluptates reiciendis quidem
-                      repudiandae delectus sunt id, nihil porro nam ratione! Accusamus, asperiores. Similique debitis
-                      architecto ullam necessitatibus maiores, libero, deleniti quasi perferendis distinctio mollitia
-                      cumque. Id enim quia ratione autem sapiente dolores iste vero minima libero blanditiis est
-                      praesentium neque molestias, sequi nobis ullam labore nesciunt consequatur et beatae aliquam magni
-                      culpa? Deleniti laboriosam possimus ad nihil harum cum ratione praesentium vitae minus tempore
-                      inventore fugiat deserunt magnam vero obcaecati excepturi illum, animi voluptatum ullam
-                      repellendus impedit provident! Atque tenetur ea porro voluptate. Cumque similique eius
-                      voluptatibus quas nisi omnis atque consectetur possimus laborum, ipsa fuga, quibusdam unde?
-                      Tenetur sapiente totam aperiam sunt facere exercitationem nulla adipisci expedita, hic amet, culpa
-                      eaque mollitia cupiditate dignissimos velit incidunt ipsum aliquam, soluta vitae ad magnam
-                      facilis. Nam facere, perspiciatis dolore aliquam non explicabo, quo omnis distinctio quaerat
-                      eveniet quasi tenetur expedita aliquid temporibus unde eius sit, eos nemo. Deleniti ducimus rerum
-                      et dolorum minima. Odit, consequuntur quidem esse cupiditate magnam enim eligendi reprehenderit,
-                      fuga quia corporis sint. Minus explicabo voluptatem consequatur, dolores error ab odio vero. Quas
-                      quibusdam deserunt voluptatum, dolorem cum voluptatibus reiciendis excepturi suscipit quo hic!
-                      Distinctio repellendus perferendis maiores veniam inventore repellat illum totam nobis fugit
-                      consequatur architecto obcaecati exercitationem quos beatae, repudiandae itaque eos, cupiditate
-                      facilis explicabo doloremque ipsum blanditiis. Dolores possimus a eos, fugit, distinctio
-                      repudiandae earum dicta aspernatur eius provident nobis autem sit molestiae ullam recusandae iusto
-                      cumque. Totam suscipit reprehenderit qui blanditiis! Suscipit dolorem nihil, id accusantium
-                      deserunt architecto dolor voluptate magnam quasi, illo repellat pariatur aliquam, deleniti
-                      recusandae cumque itaque dolorum laboriosam. Culpa architecto quam quasi. Consequatur harum facere
-                      sed? Inventore, officia sed labore soluta corrupti fugit tenetur, ipsum earum repudiandae saepe
-                      iure voluptatem, dolorum consectetur dicta nisi. Inventore cupiditate dolorum eos dolor et quis
-                      nostrum eaque, quisquam harum doloribus. Tempore, cupiditate quas corrupti qui et culpa id,
-                      pariatur ea voluptate magni perspiciatis neque officia assumenda animi, dolores velit amet
-                      quisquam laborum suscipit eos quidem necessitatibus ad. Cum voluptatum ab, atque alias deleniti
-                      similique perferendis officia libero impedit voluptatibus, ut, laboriosam iure nemo! Ab, neque.
-                      Rerum et cum, repellendus illum ipsa atque error. Nihil fuga, aliquam fugiat expedita tempore
-                      eligendi at, consequuntur architecto officiis dolorum vel, aliquid ducimus nesciunt repudiandae.
-                      Alias illum eius consequuntur corrupti reprehenderit, assumenda pariatur minima doloremque
-                      deleniti repellat eligendi quis? Cumque vero, repellendus ea, expedita atque in enim minima, nihil
-                      eum iure quia voluptatem sed odio nostrum quam dicta sint. Minus reprehenderit itaque molestiae
-                      perspiciatis repellat mollitia vero impedit totam libero. Iusto error expedita culpa inventore?
-                    </h1>
-                  </div>
-                </div>
+
+                {/*Text input and submit button*/}
                 <div className='flex mt-auto space-x-2 w-full items-end'>
                   <input
+                    value={prompt}
                     type='text'
                     placeholder='Type your message here...'
                     className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none'
+                    onChange={e => setPrompt(e.target.value)}
                   />
-                  <button
-                    className='py-2 px-4 bg-[#c5ece0] rounded-lg hover:bg-green-200 text-black'
-                    onClick={() => console.log('Submit message')}
-                  >
+                  <button className='py-2 px-4 bg-[#c5ece0] rounded-lg hover:bg-green-200 text-black' onClick={submit}>
                     Send
                   </button>
                 </div>
