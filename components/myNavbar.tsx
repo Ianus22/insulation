@@ -23,14 +23,12 @@ import {
 
 import { useEffect, useState } from 'react';
 import { auth, logOut } from '@/services/llm/firebase';
-import { useRouter } from 'next/navigation';
 import { onAuthStateChanged } from 'firebase/auth';
 import LanguageToggle from '@/components/languageToggle';
 
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const router = useRouter();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
@@ -43,7 +41,7 @@ export function MyNavbar() {
   }, []);
 
   return (
-    <div className='flex z-50 w-full border-b border-gray-300'>
+    <div className='relative z-50 w-full border-b border-gray-300'>
       <NavigationMenu>
         <NavigationMenuList>
           <div className='flex items-center justify-between p-4 w-full'>
@@ -99,7 +97,6 @@ export function MyNavbar() {
                         <AlertDialogAction
                           onClick={() => {
                             logOut();
-                            router.refresh();
                           }}
                           className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                         >
@@ -115,9 +112,6 @@ export function MyNavbar() {
               </div>
             </div>
             <div className='flex items-center md:hidden'>
-              <div className='mr-2'>
-                <LanguageToggle /> {/* Move LanguageToggle here for mobile */}
-              </div>
               <button onClick={toggleMobileMenu} className='text-gray-700 focus:outline-none'>
                 <svg
                   className='w-6 h-6'
@@ -173,7 +167,6 @@ export function MyNavbar() {
                           <AlertDialogAction
                             onClick={() => {
                               logOut();
-                              router.refresh();
                             }}
                             className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                           >
@@ -184,6 +177,9 @@ export function MyNavbar() {
                     </AlertDialog>
                   </NavigationMenuItem>
                 )}
+                <NavigationMenuItem>
+                  <LanguageToggle /> {/* Add LanguageToggle here for mobile dropdown */}
+                </NavigationMenuItem>
               </div>
             </div>
           )}
