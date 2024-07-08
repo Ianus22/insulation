@@ -8,15 +8,18 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.log(error);
   }
-
   if (formData == null) return new NextResponse('Invalid body.', { status: 400 });
-
-  const result = await OPENAI.audio.transcriptions.create({
-    file: formData.get('file') as File,
-    model: 'whisper-1',
-    language: 'en'
-  });
-
-  return new NextResponse(result.text);
+  const file = formData.get('file') as File;
+  if (!file) return new NextResponse('File is required.', { status: 400 });
+  try {
+    const result = await OPENAI.audio.transcriptions.create({
+      file,
+      model: 'whisper-1',
+      language: 'en'
+    });
+    return new NextResponse(result.text);
+  } catch (error) {
+    console.error('Error processing transcription:', error);
+    return new NextResponse('Internal Server Error', { status: 500 });
+  }
 }
-

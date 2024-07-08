@@ -1,9 +1,5 @@
 import { ASSISTANTS, THREAD_TEMPERATURE, THREAD_TIMEOUT, OPENAI } from './openai';
 
-const attachedImages = new Map<string, string>();
-
-const threadTimeouts = new Map<string, NodeJS.Timeout>();
-
 interface Message {
   id: string;
   object: string;
@@ -17,19 +13,10 @@ interface Message {
   metadata: any;
 }
 
-function resetThreadTimeout(threadId: string) {
-  clearTimeout(threadTimeouts.get(threadId));
-
-  threadTimeouts.set(
-    threadId,
-    setTimeout(() => deleteThread(threadId), THREAD_TIMEOUT)
-  );
-}
-
 async function beginThread(image: File, prompt: string) {
   const uploadedImage = await OPENAI.files.create({
     file: image,
-    purpose: 'assistants'
+    purpose: 'vision'
   });
 
   const thread = await OPENAI.beta.threads.create({
@@ -53,15 +40,10 @@ async function beginThread(image: File, prompt: string) {
     ]
   });
 
-  attachedImages.set(thread.id, uploadedImage.id);
-  resetThreadTimeout(thread.id);
-
   return thread.id;
 }
 
 async function runThread(threadId: string, extraPrompt?: string) {
-  resetThreadTimeout(threadId);
-
   const run = OPENAI.beta.threads.runs.stream(threadId, {
     assistant_id: ASSISTANTS.Insulation,
     temperature: THREAD_TEMPERATURE,
@@ -92,16 +74,37 @@ async function runThread(threadId: string, extraPrompt?: string) {
 }
 
 async function deleteThread(threadId: string) {
-  clearTimeout(threadTimeouts.get(threadId));
-  threadTimeouts.delete(threadId);
+  const { imageId } = await getThread(threadId);
 
-  await OPENAI.files.del(attachedImages.get(threadId)!);
+  await OPENAI.files.del(imageId);
   await OPENAI.beta.threads.del(threadId);
 }
 
-async function getMessages(threadId: string): Promise<Message[]> {
-  const threadMessages = await OPENAI.beta.threads.messages.list(threadId);
-  return Object.values(threadMessages);
+async function getThread(threadId: string) {
+  const thread = await OPENAI.beta.threads.messages.list(threadId);
+
+  const messages = [...thread.data].reverse();
+
+  const firstMessage = messages[0].content;
+  if (firstMessage[0].type !== 'image_file') throw new Error('Invalid thread!');
+
+  const imageId = firstMessage[0].image_file.file_id;
+
+  const texts = [
+    firstMessage[1].type === 'text' ? firstMessage[1].text.value : '',
+    ...messages
+      .slice(1)
+      .filter(message => message.content.length > 0)
+      .map(({ content: [message] }) => (message.type === 'text' ? message.text.value : ''))
+  ];
+
+  return { imageId, texts };
 }
 
-export { resetThreadTimeout, beginThread, runThread, deleteThread, getMessages };
+async function getImage(imageId: string) {
+  const res = await OPENAI.files.content(imageId);
+  return [await res.arrayBuffer(), res.headers] as const;
+}
+
+export { beginThread, runThread, deleteThread, getThread, getImage };
+

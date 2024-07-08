@@ -31,8 +31,7 @@ export default function Signup() {
 
   return (
     <>
-      <MyNavbar></MyNavbar>
-      <div className='flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 max-w-xl mx-auto shadow-lg mt-6'>
+      <div className='flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 max-w-xl mx-auto shadow-lg mt-6 mb-10'>
         <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
           <div className='flex items-center justify-center'>
             <Image src='/images/logo1.png' alt='Logo' width={150} height={40} />
