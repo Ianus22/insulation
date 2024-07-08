@@ -292,9 +292,9 @@ const ImageUploadComponent: React.FC = () => {
           <div
             className={`flex flex-col items-center ${
               showOldChat
-                ? `w-full max-w-full h-screen border border-gray-200 ${isSidebarOpen ? 'md:ml-64' : ''}`
+                ? `w-10/12 border border-gray-200 overflow-y-scroll h-[35rem] ${isSidebarOpen ? 'md:ml-64' : ''}`
                 : 'w-11/12 max-w-2xl'
-            }  mx-auto p-8 rounded-lg shadow-md ml-auto`}
+            } mx-auto p-8 rounded-lg shadow-md ml-auto  overflow-y-auto`}
           >
             {showOldChat ? (
               <>
@@ -307,12 +307,11 @@ const ImageUploadComponent: React.FC = () => {
                         alt='placeholder'
                         width={180}
                         height={150}
-                        className='rounded-lg shadow-lg border border-black'
+                        className='rounded-lg shadow-lg border border-black w-24 md:w-52'
                       />
                     </div>
                   </div>
                 </div>
-
                 <div className='ml-auto md:ml-auto'>
                   {chatData?.texts.map((x, i) => (
                     <div key={i}>
