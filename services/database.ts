@@ -67,3 +67,4 @@ const deleteUser = async (uId: string) => {
   const dbRef = ref(database, `Users/${uId}`);
   await remove(dbRef);
 };
+
