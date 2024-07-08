@@ -10,14 +10,14 @@ function createLocalization<TLangs extends string, TKeys extends string, TLang e
   translations: Translations<TLangs, TKeys>,
   defaultLang: TLang
 ) {
-  const languageState = createGlobalState(defaultLang);
+  const languageState = createGlobalState<TLangs>(defaultLang);
 
   return [
     languageState,
     () => {
       const language = useGlobalState(languageState);
 
-      return (key: TKeys) => translations[language.value][key];
+      return (key: TKeys) => translations[language.value][key] as string;
     }
   ] as const;
 }
