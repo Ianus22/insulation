@@ -10,7 +10,9 @@ import { APICreateThread, APIGetThread, APIRunThread } from '@/frontend-api/thre
 import { transcribeAudio } from '../api/whisperApi/whisper';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
-import { FaMicrophone } from 'react-icons/fa';
+import { FaMicrophone } from 'react-icons/fa6';
+import { useRouter } from 'next/navigation';
+import { auth } from '@/services/firebase';
 import { HiOutlineChatBubbleBottomCenterText } from 'react-icons/hi2';
 import { error } from 'console';
 
@@ -40,10 +42,17 @@ const ImageUploadComponent: React.FC = () => {
   const audioChunksRef = useRef<Blob[]>([]);
   const placeholder = '/images/placeholder.png';
 
+  const router = useRouter();
+
   const threadId = useRef<string | null>(null);
 
   let isImageValidFlag = false;
   let textStart: string = '';
+
+  useEffect(() => {
+    if (auth.currentUser != null) return;
+    router.push('/sign-up');
+  }, []);
 
   useEffect(() => {
     if (image == null) {

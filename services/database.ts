@@ -1,4 +1,4 @@
-import { firebaseApp } from './llm/firebase';
+import { firebaseApp } from './firebase';
 import { getDatabase, ref, set, get, update, remove, push } from 'firebase/database';
 
 const database = getDatabase(firebaseApp);
@@ -64,3 +64,4 @@ const deleteUser = async (uId: string) => {
   const dbRef = ref(database, `Users/${uId}`);
   await remove(dbRef);
 };
+
