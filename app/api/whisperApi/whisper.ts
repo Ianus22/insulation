@@ -7,5 +7,9 @@ export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
     body: formData
   });
 
+  if (!response.ok) {
+    throw new Error('Failed to transcribe audio');
+  }
+
   return await response.text();
 };

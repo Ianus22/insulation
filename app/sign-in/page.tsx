@@ -27,8 +27,7 @@ export default function Signin() {
 
   return (
     <>
-     <MyNavbar></MyNavbar>
-      <div className='flex min-h-full flex-1 mt-6 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 rounded-lg shadow-lg max-w-lg mx-auto'>
+      <div className='flex min-h-full flex-1 mt-6 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 rounded-lg shadow-lg max-w-lg mx-auto mb-10'>
         <div className='sm:mx-auto sm:w-full sm:max-w-sm '>
           <div className='flex items-center justify-center'>
             <Image src='/images/logo1.png' alt='Logo' width={150} height={40} />
