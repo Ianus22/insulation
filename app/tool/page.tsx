@@ -20,6 +20,7 @@ const ImageUploadComponent: React.FC = () => {
   const [isImageValid, setIsImageValid] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const [response, setResponse] = useState<string>('');
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [prompt, setPrompt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [dragOver, setDragOver] = useState(false);
@@ -165,8 +166,9 @@ const ImageUploadComponent: React.FC = () => {
         audioChunksRef.current = [];
         try {
           setIsValidating(true);
-          const transcribedText = await transcribeAudio(audioBlob);
-          setPrompt(prev => `${prev} ${transcribedText}`);
+          const { transcription, audioUrl } = await transcribeAudio(audioBlob);
+          setPrompt(prev => `${prev} ${transcription}`);
+          setAudioUrl(audioUrl); // Save the audio URL
           setIsValidating(false);
         } catch (error) {
           if (error instanceof Error) {
@@ -382,6 +384,15 @@ const ImageUploadComponent: React.FC = () => {
                   <div className='w-full p-4 border border-gray-300 rounded-lg bg-white'>
                     <Markdown className='text-gray-400'>{response === '' ? 'Returned result' : response}</Markdown>
                   </div>
+                  {audioUrl && (
+                    <div className='mt-4'>
+                      <h3 className='text-black text-lg font-semibold'>Recorded Audio</h3>
+                      <audio controls>
+                        <source src={audioUrl} type='audio/mpeg' />
+                        Your browser does not support the audio element.
+                      </audio>
+                    </div>
+                  )}
                 </div>
               </>
             )}

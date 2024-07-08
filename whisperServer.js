@@ -13,6 +13,7 @@ const apiKey = process.env.OPENAI_API_KEY;
 const apiUrl = 'https://api.openai.com/v1/audio/transcriptions';
 
 app.use(express.static('public'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.post('/transcribe', upload.single('audio'), async (req, res) => {
   try {
@@ -38,10 +39,10 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
           }
         });
 
-        fs.unlinkSync(audioPath); // Delete the original audio file
-        fs.unlinkSync(convertedAudioPath); // Delete the converted audio file
-
-        res.json({ transcription: response.data });
+        res.json({
+          transcription: response.data.transcription,
+          audioUrl: `/uploads/${path.basename(convertedAudioPath)}`
+        });
       } catch (error) {
         console.error('Error transcribing audio:', error);
         res.status(500).send('Error transcribing audio');

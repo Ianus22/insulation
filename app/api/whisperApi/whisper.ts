@@ -1,7 +1,7 @@
 import axios from 'axios';
 import FormData from 'form-data';
 
-export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
+export const transcribeAudio = async (audioBlob: Blob): Promise<{ transcription: string; audioUrl: string }> => {
   try {
     const formData = new FormData();
     formData.append('file', audioBlob);
