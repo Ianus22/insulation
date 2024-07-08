@@ -277,9 +277,9 @@ const ImageUploadComponent: React.FC = () => {
           <div
             className={`flex flex-col items-center ${
               showOldChat
-                ? `w-10/12 border border-gray-200 overflow-y-scroll ${isSidebarOpen ? 'md:ml-64' : ''}`
+                ? `w-10/12 border border-gray-200 overflow-y-scroll h-[35rem] ${isSidebarOpen ? 'md:ml-64' : ''}`
                 : 'w-11/12 max-w-2xl'
-            } mx-auto p-8 rounded-lg shadow-md ml-auto h-[35rem] overflow-y-auto`}
+            } mx-auto p-8 rounded-lg shadow-md ml-auto  overflow-y-auto`}
           >
             {showOldChat ? (
               <>
