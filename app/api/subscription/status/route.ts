@@ -1,4 +1,4 @@
-import { getCustomerIdFromUserId, stripeAdmin } from '@/services/stripeAdmin';
+import { checkSubscription, getCustomerIdFromUserId, stripeAdmin } from '@/services/stripeAdmin';
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserIdFromRequest } from '@/services/auth';
 
@@ -9,10 +9,8 @@ export async function GET(request: NextRequest) {
 
   const customerId = await getCustomerIdFromUserId(userId);
 
-  const subscriptions = await stripeAdmin.subscriptions.list({
-    customer: customerId
-  });
+  const subscription = await checkSubscription(customerId);
 
-  return NextResponse.json(subscriptions.data);
+  return NextResponse.json({ subscription });
 }
 
