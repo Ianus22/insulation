@@ -36,8 +36,6 @@ export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
 
-  const language = useGlobalState(languageState);
-
   const loc = useLocalization();
 
   const toggleMobileMenu = () => {
@@ -69,7 +67,6 @@ export function MyNavbar() {
                 </div>
               </div>
             </Link>
-            <p onClick={() => (language.value = language.value == 'en' ? 'de' : 'en')}>{language.value}</p>
             <div className='block md:hidden'>
               <button onClick={toggleMobileMenu} className='text-gray-700 focus:outline-none'>
                 <svg
