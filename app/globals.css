@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  box-sizing: border-box;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -81,3 +85,4 @@
   border-bottom-color: #3490dc;
   border-left-color: transparent;
 }
+
