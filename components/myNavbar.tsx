@@ -26,10 +26,13 @@ import { auth, firebaseApp, logOut } from '@/services/firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import LanguageToggle from '@/components/languageToggle';
+import { useRouter } from 'next/navigation';
 
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+  const router = useRouter();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
@@ -97,7 +100,7 @@ export function MyNavbar() {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => {
-                            logOut();
+                            logOut(router);
                           }}
                           className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                         >
@@ -167,7 +170,7 @@ export function MyNavbar() {
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => {
-                              logOut();
+                              logOut(router);
                             }}
                             className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                           >
@@ -210,4 +213,3 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
 );
 ListItem.displayName = 'ListItem';
 export default MyNavbar;
-

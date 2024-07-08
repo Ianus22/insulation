@@ -3,6 +3,8 @@ import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getDatabase } from 'firebase/database';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDaaFPnoKctYeVyGeVjFg_bVpV_2TpEiUw',
@@ -40,8 +42,9 @@ export const signIn = async (email: string, password: string) => {
 };
 
 // Sign out
-export const logOut = async () => {
+export const logOut = async (router: any) => {
   try {
+    router.push('/');
     await signOut(auth);
   } catch (error) {
     throw error;

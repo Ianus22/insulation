@@ -19,7 +19,7 @@ export default function Signin() {
     setError(null);
     try {
       const user = await signIn(email, password);
-      router.push('/');
+      router.back();
     } catch (error: any) {
       setError('Invalid email or password. Please try again.');
     }
@@ -112,4 +112,3 @@ export default function Signin() {
     </>
   );
 }
-

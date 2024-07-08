@@ -22,8 +22,7 @@ export default function Signup() {
     setError(null);
     try {
       const user = await signUp(email, password);
-
-      router.push('/');
+      router.back();
     } catch (error: any) {
       setError(error.message);
     }
@@ -120,4 +119,3 @@ export default function Signup() {
     </>
   );
 }
-

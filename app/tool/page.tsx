@@ -52,7 +52,7 @@ const ImageUploadComponent: React.FC = () => {
 
   useEffect(() => {
     if (auth.currentUser != null) return;
-    router.push('/sign-up');
+    router.push('/sign-in');
   }, []);
 
   useEffect(() => {
@@ -237,6 +237,7 @@ const ImageUploadComponent: React.FC = () => {
   };
 
   const loadChat = async (chatId: string) => {
+    if (getAuth().currentUser == null) return;
     setChatData(await APIGetThread(chatId));
   };
 
