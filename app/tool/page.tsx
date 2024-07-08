@@ -51,8 +51,10 @@ const ImageUploadComponent: React.FC = () => {
   let textStart: string = '';
 
   useEffect(() => {
-    if (auth.currentUser != null) return;
-    router.push('/sign-in');
+    auth.authStateReady().then(() => {
+      if (auth.currentUser != null) return;
+      router.push('/sign-in');
+    });
   }, []);
 
   useEffect(() => {

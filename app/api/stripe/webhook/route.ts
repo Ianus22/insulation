@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
 
   try {
     await databaseAdmin.ref(`/Users/${userId}/CustomerID`).set(data.customer);
-    console.log(data);
 
     return new Response('Subscription added', {
       status: 200
