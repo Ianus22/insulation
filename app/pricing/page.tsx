@@ -18,7 +18,7 @@ const Pricing = () => {
             </p>
             <ul className='mt-6 space-y-4 text-gray-600'>
               <li>3 free tries</li>
-              <li>limited result</li>
+              <li>3 free image uploads</li>
             </ul>
             <button className=' text-black py-2 px-4 rounded bg-[#c5ece0] mt-20'>Select</button>
           </div>
