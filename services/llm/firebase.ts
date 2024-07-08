@@ -16,19 +16,15 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-console.log('Firebase App Initialized:', app); // Debugging log
 export const auth = getAuth(app);
-console.log('Firebase Auth Initialized:', auth); // Debugging log
 const database = getDatabase(app);
 
 // Sign up
 export const signUp = async (email: string, password: string) => {
   try {
-    console.log('Firebase Auth: ', auth);
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     return userCredential.user;
   } catch (error) {
-    console.error('Error signing up:', error);
     throw error;
   }
 };
@@ -39,18 +35,15 @@ export const signIn = async (email: string, password: string) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential.user;
   } catch (error) {
-    console.error('Error signing in:', error);
     throw error;
   }
 };
 
 // Sign out
 export const logOut = async () => {
-  console.log('Signing out');
   try {
     await signOut(auth);
   } catch (error) {
-    console.error('Error signing out:', error);
     throw error;
   }
 };

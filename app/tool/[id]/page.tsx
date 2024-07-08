@@ -23,6 +23,8 @@ const ImageUploadComponent: React.FC = () => {
   const [prompt, setPrompt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
+  const { id: threadId } = useParams() as { id: string };
+
   let textStart: string = '';
 
   let isImageValidFlag = false;
@@ -45,19 +47,8 @@ const ImageUploadComponent: React.FC = () => {
       setIsValidating(false);
       setIsImageValid(true);
       if (prompt == null || prompt.length == 0)
-        setPrompt(
-          'What is the best way to insolate and fireproof the area shown in the image given the requirements above?'
-        );
+        setPrompt('What is the best way to insulate and fireproof the area shown in the image given above?');
     }, 500);
-    /*ValidateImage(image, prompt).then(x => {
-      setIsValidating(false);
-      setIsImageValid(x.is_valid);
-      if (x.is_valid) {
-        setPrompt(x.reworked_prompt);
-      } else {
-        setErrorMessage(x.reason);
-      }
-    });*/
 
     return () => reader.removeEventListener('load', onImageLoaded);
   }, [image, prompt]);
@@ -73,10 +64,6 @@ const ImageUploadComponent: React.FC = () => {
   const submit = async () => {
     if (!canClickButton || !image) return;
     setIsGenerating(true);
-
-    const { id: threadId } = useParams() as { id: string };
-
-    console.log(getMessages(threadId));
 
     await APIRunThread(threadId, prompt, text => {
       if (textStart.length < 12) {

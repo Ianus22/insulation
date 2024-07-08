@@ -49,7 +49,6 @@ export const getChats = async (uId: string): Promise<ChatData[] | null> => {
     const result: ChatData[] = Object.values(data);
     return result;
   } else {
-    console.log('Chat not found');
     return null;
   }
 };
