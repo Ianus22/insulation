@@ -6,7 +6,7 @@ import Markdown from 'react-markdown';
 import Spinner from '@/components/ui/Spinner';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
-import { APICreateThread, APIRunThread } from '@/frontend-api/thread';
+import { APICreateThread, APIGetThread, APIRunThread } from '@/frontend-api/thread';
 import { transcribeAudio } from '../api/whisperApi/whisper';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
@@ -30,11 +30,11 @@ const ImageUploadComponent: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [dragOver, setDragOver] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [oldChats, setOldChats] = useState<any[]>([]);
+  const [oldChats, setOldChats] = useState<Record<string, string>>({});
   const [isRecording, setIsRecording] = useState(false);
   const [selectedChat, setSelectedChat] = useState<any | null>(null);
   const [showOldChat, setShowOldChat] = useState(false);
-  const [ChatData, setChatData] = useState<ChatData | null>(null);
+  const [chatData, setChatData] = useState<ChatData | null>(null);
   const selectorRef = useRef<HTMLInputElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -68,11 +68,12 @@ const ImageUploadComponent: React.FC = () => {
 
   useEffect(() => {
     const fetchChats = async () => {
+      console.log('fetching chats');
       const currUser = getAuth().currentUser;
-      if (currUser) {
+      if (currUser != null) {
         const chats = await getChats(currUser.uid);
-        setOldChats(chats || []);
-      }
+        setOldChats(chats || {});
+      } else console.log('User is null');
     };
     fetchChats();
   }, []);
@@ -104,43 +105,36 @@ const ImageUploadComponent: React.FC = () => {
   };
 
   const submit = async () => {
-    if (!canClickButton || !image) return;
+    const isFirstMessage = threadId.current == null;
+
+    console.log('submiting');
+
+    if (threadId.current == null) {
+      console.log('thread is null');
+      if (!canClickButton || !image) return;
+
+      threadId.current = await APICreateThread(image, prompt);
+      if (getAuth().currentUser != null) createChat(getAuth().currentUser!.uid, threadId.current!);
+    } else {
+      console.log('thread is not null');
+      chatData?.texts.push(prompt);
+    }
     setIsGenerating(true);
     setIsImageValid(false);
     setIsValidating(true);
 
-    const isFirstMessage = threadId.current == null;
-
-    if (threadId.current == null) threadId.current = await APICreateThread(image, prompt);
-
-    if (threadId.current == null) return;
-
-    if (threadId == null) {
+    if (threadId == null || threadId.current == null) {
+      console.log('Thread is somehow null');
       setIsGenerating(false);
       return;
     }
 
+    console.log('submiting prompt');
     await APIRunThread(threadId.current, isFirstMessage ? null : prompt, text => {
-      if (textStart.length < 12) {
-        textStart += text;
-        if (textStart.length >= 12) {
-          if (textStart.startsWith('Bad Request:')) {
-            setIsImageValid(false);
-            setIsValidating(false);
-            isImageValidFlag = false;
-          } else {
-            setIsImageValid(true);
-            setIsValidating(false);
-            isImageValidFlag = true;
-            setResponse(res => res + textStart);
-          }
-        }
-      } else {
-        if (isImageValidFlag) setResponse(res => res + text);
-        else setErrorMessage(error => error + text);
-      }
+      onTextCollected(text);
     });
 
+    console.log('result over');
     setIsGenerating(false);
   };
 
@@ -189,13 +183,34 @@ const ImageUploadComponent: React.FC = () => {
     }
   };
 
+  function onTextCollected(text: string) {
+    if (textStart.length < 12) {
+      textStart += text;
+      if (textStart.length >= 12) {
+        if (textStart.startsWith('Bad Request:')) {
+          setIsImageValid(false);
+          setIsValidating(false);
+          isImageValidFlag = false;
+        } else {
+          setIsImageValid(true);
+          setIsValidating(false);
+          isImageValidFlag = true;
+          setResponse(res => res + textStart);
+        }
+      }
+    } else {
+      if (isImageValidFlag) setResponse(res => res + text);
+      else setErrorMessage(error => error + text);
+    }
+  }
+
   const handleAudioButton = () => {
     if (isRecording) handleAudioStop();
     else handleAudioStart();
   };
 
   const loadChat = async (chatId: string) => {
-    // Fetch and display the chat data using the chatId
+    setChatData(await APIGetThread(chatId));
   };
 
   const imageBorderColor = useMemo(() => {
@@ -236,43 +251,34 @@ const ImageUploadComponent: React.FC = () => {
               Close
             </button>
             <h2 className='text-xl font-semibold mb-4'>Previous Chats</h2>
-            <ul>
-              {oldChats.map((chat, index) => (
-                <li
-                  key={index}
-                  className={`mb-2 p-2 bg-white rounded shadow cursor-pointer ${
-                    selectedChat?.id === chat.id ? 'bg-green-100' : ''
-                  }`}
-                >
-                  <div
-                    onClick={() => {
-                      setSelectedChat(chat);
-                      loadChat(chat.id);
-                    }}
-                  >
-                    {chat.title}
-                  </div>
-                  <button
-                    className='mt-2 py-1 px-3 bg-blue-500 text-white rounded hover:bg-blue-700'
-                    onClick={() => loadChat(chat.id)}
-                  >
-                    Open Chat
-                  </button>
-                </li>
-              ))}
-            </ul>
+
             <button
               className='w-full mt-4 py-2 px-4 hover:bg-green-200 bg-[#c5ece0] text-black p-2 border-2 border-gray-400 rounded-lg'
-              onClick={() => setShowOldChat(false)}
+              onClick={() => {
+                threadId.current = null;
+                setSelectedChat(null);
+                setShowOldChat(false);
+              }}
             >
               New Chat
             </button>
-            <button
-              className='w-full mt-4 py-2 px-4 hover:bg-green-200 bg-gray-200 text-black p-2 border-2 border-gray-400 rounded-lg'
-              onClick={() => setShowOldChat(true)}
-            >
-              Old Chat1
-            </button>
+
+            <ul>
+              {Object.keys(oldChats).map((chatId, i) => (
+                <button
+                  key={i}
+                  className='w-full mt-4 py-2 px-4 hover:bg-green-200 bg-gray-200 text-black p-2 border-2 border-gray-400 rounded-lg'
+                  onClick={() => {
+                    setSelectedChat(chatId);
+                    threadId.current = chatId;
+                    loadChat(chatId);
+                    setShowOldChat(true);
+                  }}
+                >
+                  {oldChats[chatId]}
+                </button>
+              ))}
+            </ul>
           </div>
           <div
             className={`flex flex-col items-center ${
@@ -287,9 +293,8 @@ const ImageUploadComponent: React.FC = () => {
                 <div className='ml-auto md:ml-auto'>
                   <div className='flex flex-col space-y-4 items-end'>
                     <div className='relative'>
-                      {/*TODO: assign to the actual first image*/}
-                      <Image
-                        src={placeholder}
+                      <img
+                        src={`/api/thread/image/${chatData?.imageId}`}
                         alt='placeholder'
                         width={180}
                         height={150}
@@ -300,13 +305,12 @@ const ImageUploadComponent: React.FC = () => {
                 </div>
 
                 <div className='ml-auto md:ml-auto'>
-                  {ChatData?.texts.map((x, i) => (
-                    <>
+                  {chatData?.texts.map((x, i) => (
+                    <div key={i}>
                       {/*User's messages*/}
                       {i % 2 == 0 && (
                         <div className='flex flex-col space-y-4 items-end'>
                           <div className='bg-[#c5ece0] p-2 md:p-4 rounded-md border border-black'>
-                            {/*TODO: assign to the actual first prompt*/}
                             <h1>{x}</h1>
                           </div>
                         </div>
@@ -315,25 +319,30 @@ const ImageUploadComponent: React.FC = () => {
                       {/*AI's responses*/}
                       {i % 2 == 1 && (
                         <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black'>
-                          {/*TODO: assign to the actual first result*/}
                           <h1>{x}</h1>
                         </div>
                       )}
-                    </>
+                    </div>
                   ))}
+
+                  {/*Current responce*/}
+                  {response.length > 0 && (
+                    <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black'>
+                      <h1>{response}</h1>
+                    </div>
+                  )}
                 </div>
 
                 {/*Text input and submit button*/}
                 <div className='flex mt-auto space-x-2 w-full items-end'>
                   <input
+                    value={prompt}
                     type='text'
                     placeholder='Type your message here...'
                     className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none'
+                    onChange={e => setPrompt(e.target.value)}
                   />
-                  <button
-                    className='py-2 px-4 bg-[#c5ece0] rounded-lg hover:bg-green-200 text-black'
-                    onClick={() => console.log('Submit message')}
-                  >
+                  <button className='py-2 px-4 bg-[#c5ece0] rounded-lg hover:bg-green-200 text-black' onClick={submit}>
                     Send
                   </button>
                 </div>
@@ -414,4 +423,3 @@ const ImageUploadComponent: React.FC = () => {
 };
 
 export default ImageUploadComponent;
-
