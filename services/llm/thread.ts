@@ -82,6 +82,7 @@ async function deleteThread(threadId: string) {
 
 async function getThread(threadId: string) {
   const thread = await OPENAI.beta.threads.messages.list(threadId);
+  const createdAt: string = new Date(await (await OPENAI.beta.threads.retrieve(threadId)).created_at).toString();
 
   const messages = [...thread.data].reverse();
 
@@ -107,4 +108,3 @@ async function getImage(imageId: string) {
 }
 
 export { beginThread, runThread, deleteThread, getThread, getImage };
-

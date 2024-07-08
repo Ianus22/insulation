@@ -9,12 +9,13 @@ import Footer from '@/components/myFooter';
 import { APICreateThread, APIGetThread, APIRunThread } from '@/frontend-api/thread';
 import { transcribeAudio } from '../api/whisperApi/whisper';
 import { getAuth } from 'firebase/auth';
-import { getUser, createChat, getChats } from '@/services/database';
+import { getUser, createChat, getChats, getChat } from '@/services/database';
 import { FaMicrophone } from 'react-icons/fa6';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/services/firebase';
+import { auth, database } from '@/services/firebase';
 import { HiOutlineChatBubbleBottomCenterText } from 'react-icons/hi2';
 import { error } from 'console';
+import { getThread } from '@/services/llm/thread';
 
 interface ChatData {
   imageId: string;
@@ -122,15 +123,25 @@ const ImageUploadComponent: React.FC = () => {
       console.log('thread is null');
       if (!canClickButton || !image) return;
 
+      setIsGenerating(true);
+      setIsImageValid(false);
+      setIsValidating(true);
+
       threadId.current = await APICreateThread(image, prompt);
-      if (getAuth().currentUser != null) createChat(getAuth().currentUser!.uid, threadId.current!);
+      if (getAuth().currentUser != null)
+        createChat(
+          getAuth().currentUser!.uid,
+          threadId.current!,
+          await getCreationTime(getAuth().currentUser!.uid, threadId.current!)
+        );
     } else {
       console.log('thread is not null');
       chatData?.texts.push(prompt);
+
+      setIsGenerating(true);
+      setIsImageValid(false);
+      setIsValidating(true);
     }
-    setIsGenerating(true);
-    setIsImageValid(false);
-    setIsValidating(true);
 
     if (threadId == null || threadId.current == null) {
       console.log('Thread is somehow null');
@@ -141,6 +152,13 @@ const ImageUploadComponent: React.FC = () => {
     console.log('submiting prompt');
     await APIRunThread(threadId.current, isFirstMessage ? null : prompt, text => {
       onTextCollected(text);
+    }).then(x => {
+      if (!x) return;
+
+      setResponse(res => {
+        // chatData?.texts.push(res);
+        return '';
+      });
     });
 
     console.log('result over');
@@ -280,6 +298,7 @@ const ImageUploadComponent: React.FC = () => {
                   onClick={() => {
                     setSelectedChat(chatId);
                     threadId.current = chatId;
+                    setChatData(null);
                     loadChat(chatId);
                     setShowOldChat(true);
                   }}
@@ -432,3 +451,27 @@ const ImageUploadComponent: React.FC = () => {
 };
 
 export default ImageUploadComponent;
+
+async function getCreationTime(uId: string, threadId: string) {
+  const timestamp = Date.now();
+  const date = new Date(timestamp);
+
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based, so add 1
+  const day = date.getDate().toString().padStart(2, '0');
+
+  let formattedDate = `${year}-${month}-${day}`;
+  console.log(formattedDate); // Example: 2024-07-08
+
+  const chatNames = Object.values((await getChats(uId)) ?? {});
+
+  while (chatNames.includes(formattedDate)) {
+    if (formattedDate.indexOf('(') == -1) {
+      formattedDate = formattedDate + ' (1)';
+    } else {
+      formattedDate = formattedDate.replace(/\((\d+)\)/, (_, n) => `(${parseInt(n) + 1})`);
+    }
+  }
+
+  return formattedDate;
+}

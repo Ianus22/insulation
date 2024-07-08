@@ -57,4 +57,3 @@ async function APIGetThread(threadId: string | null) {
 }
 
 export { APICreateThread, APIRunThread, APIDeleteThread, APIGetThread };
-

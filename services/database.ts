@@ -4,9 +4,9 @@ import { getDatabase, ref, set, get, update, remove, push } from 'firebase/datab
 const database = getDatabase(firebaseApp);
 
 // Using set (overwrites data at the specified location)
-export const createChat = async (uId: string, chatName: string) => {
+export const createChat = async (uId: string, chatName: string, createdAt: string) => {
   const dbRef = ref(database, `Users/${uId}/Chats/${chatName}`);
-  await set(dbRef, true);
+  await set(dbRef, createdAt);
 };
 
 // Using push (generates a unique key for each new item)
@@ -26,13 +26,13 @@ export const getUser = async (uId: string): Promise<any> => {
   }
 };
 
-export const getChatId = async (uId: string, name: string): Promise<string | null> => {
+export const getChat = async (uId: string, name: string): Promise<{ key: string | null; val: string | null }> => {
   const dbRef = ref(database, `Users/${uId}/Chats/${name}`);
   const snapshot = await get(dbRef);
   if (snapshot.exists()) {
-    return snapshot.key;
+    return { key: snapshot.key, val: snapshot.val() };
   } else {
-    return null;
+    return { key: null, val: null };
   }
 };
 
@@ -45,7 +45,6 @@ export const getChats = async (uId: string): Promise<Record<string, string> | nu
     return data;
   } else {
     console.log('User does not have chats');
-    await createChat(uId, 'test');
     return null;
   }
 };
@@ -64,4 +63,3 @@ const deleteUser = async (uId: string) => {
   const dbRef = ref(database, `Users/${uId}`);
   await remove(dbRef);
 };
-
