@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { useEffect, useState } from 'react';
-import { auth, firebaseApp, logOut } from '@/services/llm/firebase';
+import { auth, firebaseApp, logOut } from '@/services/firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
@@ -190,3 +190,4 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
 );
 ListItem.displayName = 'ListItem';
 export default MyNavbar;
+

@@ -11,6 +11,8 @@ import { transcribeAudio } from '../api/whisperApi/whisper';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
 import { FaMicrophone } from 'react-icons/fa6';
+import { useRouter } from 'next/navigation';
+import { auth } from '@/services/firebase';
 
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -27,9 +29,16 @@ const ImageUploadComponent: React.FC = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
+  const router = useRouter();
+
   let isImageValidFlag = false;
 
   let textStart: string = '';
+
+  useEffect(() => {
+    if (auth.currentUser != null) return;
+    router.push('/sign-up');
+  }, []);
 
   useEffect(() => {
     if (image == null) {

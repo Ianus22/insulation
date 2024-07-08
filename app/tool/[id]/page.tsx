@@ -7,7 +7,7 @@ import Footer from '@/components/myFooter';
 import Markdown from 'react-markdown';
 import Image from 'next/image';
 import Spinner from '@/components/ui/Spinner';
-import { firebaseApp } from '@/services/llm/firebase';
+import { firebaseApp } from '@/services/firebase';
 import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
 import { useParams } from 'next/navigation';
@@ -163,3 +163,4 @@ const ImageUploadComponent: React.FC = () => {
 };
 
 export default ImageUploadComponent;
+
