@@ -12,6 +12,12 @@ import { getAuth } from 'firebase/auth';
 import { getUser, createChat, getChats } from '@/services/database';
 import { FaMicrophone } from 'react-icons/fa';
 import { HiOutlineChatBubbleBottomCenterText } from 'react-icons/hi2';
+import { error } from 'console';
+
+interface ChatData {
+  imageId: string;
+  texts: string[];
+}
 
 const ImageUploadComponent: React.FC = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -28,6 +34,7 @@ const ImageUploadComponent: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [selectedChat, setSelectedChat] = useState<any | null>(null);
   const [showOldChat, setShowOldChat] = useState(false);
+  const [ChatData, setChatData] = useState<ChatData | null>(null);
   const selectorRef = useRef<HTMLInputElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -283,9 +290,11 @@ const ImageUploadComponent: React.FC = () => {
           >
             {showOldChat ? (
               <>
+                {/*Base Image*/}
                 <div className='ml-auto md:ml-auto'>
                   <div className='flex flex-col space-y-4 items-end'>
                     <div className='relative'>
+                      {/*TODO: assign to the actual first image*/}
                       <Image
                         src={placeholder}
                         alt='placeholder'
@@ -294,16 +303,34 @@ const ImageUploadComponent: React.FC = () => {
                         className='rounded-lg shadow-lg border border-black'
                       />
                     </div>
-                    <div className='bg-[#c5ece0] p-2 md:p-4 rounded-md border border-black'>
-                      <h1>Chat1-Prompt</h1>
-                    </div>
                   </div>
                 </div>
-                <div className='mr-auto md:mr-auto'>
-                  <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black'>
-                    <h1>Chat1-Result</h1>
-                  </div>
+
+                <div className='ml-auto md:ml-auto'>
+                  {ChatData?.texts.map((x, i) => (
+                    <>
+                      {/*User's messages*/}
+                      {i % 2 == 0 && (
+                        <div className='flex flex-col space-y-4 items-end'>
+                          <div className='bg-[#c5ece0] p-2 md:p-4 rounded-md border border-black'>
+                            {/*TODO: assign to the actual first prompt*/}
+                            <h1>{x}</h1>
+                          </div>
+                        </div>
+                      )}
+
+                      {/*AI's responses*/}
+                      {i % 2 == 1 && (
+                        <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black'>
+                          {/*TODO: assign to the actual first result*/}
+                          <h1>{x}</h1>
+                        </div>
+                      )}
+                    </>
+                  ))}
                 </div>
+
+                {/*Text input and submit button*/}
                 <div className='flex mt-auto space-x-2 w-full items-end'>
                   <input
                     type='text'
