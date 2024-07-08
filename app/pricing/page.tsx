@@ -1,18 +1,28 @@
 'use client';
 
+import {
+  APICancelSubscription,
+  APIGetSubscriptionStatus,
+  APIPurchaseSubscription,
+  SubscriptionType
+} from '@/frontend-api/stripe';
 import React, { useEffect, useState } from 'react';
-import { stripe } from '@/services/stripe';
 import MyNavbar from '@/components/myNavbar';
 import { auth } from '@/services/firebase';
 import { useRouter } from 'next/navigation';
 import Footer from '@/components/myFooter';
 import Spinner from '@/components/ui/Spinner';
-
-enum PurchaseOption {
-  Free,
-  Monthly,
-  Yearly
-}
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 
 const formatNumber = (n: number) => (n < 10 ? `0${n}` : n.toString());
 
@@ -32,13 +42,7 @@ const Pricing = () => {
 
     if (auth.currentUser == null) return;
 
-    const req = await fetch('/api/subscription/status', {
-      headers: {
-        Authorization: 'Bearer ' + (await auth.currentUser.getIdToken())
-      }
-    });
-
-    const { subscription } = await req.json();
+    const subscription = await APIGetSubscriptionStatus(auth.currentUser);
 
     setSubscription(subscription);
   };
@@ -50,7 +54,7 @@ const Pricing = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const buy = async (purchaseOption: PurchaseOption) => {
+  const buy = async (type: SubscriptionType) => {
     await auth.authStateReady();
 
     if (auth.currentUser == null) {
@@ -58,35 +62,23 @@ const Pricing = () => {
       return;
     }
 
-    if (purchaseOption === PurchaseOption.Free) {
+    if (type === SubscriptionType.Free) {
       router.push('/tool');
       return;
     }
 
-    const req = await fetch('/api/subscription/purchase', {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + (await auth.currentUser.getIdToken())
-      },
-      body: JSON.stringify({ isMonthly: purchaseOption === PurchaseOption.Monthly })
-    });
+    setLoading(true);
 
-    const result = await req.json();
-
-    await (await stripe)!.redirectToCheckout({
-      sessionId: result.id
-    });
+    const redirect = await APIPurchaseSubscription(auth.currentUser, type);
+    await redirect();
   };
 
   const cancel = async () => {
+    if (auth.currentUser == null) return;
+
     setLoading(true);
 
-    await fetch('/api/subscription/cancel', {
-      method: 'DELETE',
-      headers: {
-        Authorization: 'Bearer ' + (await auth.currentUser!.getIdToken())
-      }
-    });
+    await APICancelSubscription(auth.currentUser);
 
     await loadSubscription();
 
@@ -113,9 +105,26 @@ const Pricing = () => {
             <p className='text-lg'>
               Bills: <span className='font-bold text-lg'>{subscription.isMonthly ? 'Monthly' : 'Yearly'}</span>
             </p>
-            <button className=' text-black py-2 px-4 rounded bg-red-500' onClick={cancel}>
+            <AlertDialog>
+              <AlertDialogTrigger className='bg-red-500 text-xl py-2 px-4 square-lg rounded-lg'>
+                Cancel
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>Are you sure you want to cancel your subscription</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Close</AlertDialogCancel>
+                  <AlertDialogAction onClick={cancel} className='bg-red-500 text-black'>
+                    Cancel
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            {/* <button className=' text-black py-2 px-4 rounded bg-red-500' onClick={cancel}>
               Cancel
-            </button>
+            </button> */}
           </div>
         ) : (
           <div className='mt-10 flex flex-row flex-wrap gap-6 justify-center items-stretch'>
@@ -130,7 +139,7 @@ const Pricing = () => {
                   <li>limited result</li>
                 </ul>
               </div>
-              <button className=' text-black py-2 px-4 rounded bg-[#c5ece0]' onClick={() => buy(PurchaseOption.Free)}>
+              <button className=' text-black py-2 px-4 rounded bg-[#c5ece0]' onClick={() => buy(SubscriptionType.Free)}>
                 Select
               </button>
             </div>
@@ -149,7 +158,7 @@ const Pricing = () => {
               </div>
               <button
                 className=' text-black py-2 px-4 rounded bg-[#c5ece0]'
-                onClick={() => buy(PurchaseOption.Monthly)}
+                onClick={() => buy(SubscriptionType.Monthly)}
               >
                 Select
               </button>
@@ -167,7 +176,10 @@ const Pricing = () => {
                   <li>Continuing old chats</li>
                 </ul>
               </div>
-              <button className=' text-black py-2 px-4 rounded bg-[#c5ece0]' onClick={() => buy(PurchaseOption.Yearly)}>
+              <button
+                className=' text-black py-2 px-4 rounded bg-[#c5ece0]'
+                onClick={() => buy(SubscriptionType.Yearly)}
+              >
                 Select
               </button>
             </div>

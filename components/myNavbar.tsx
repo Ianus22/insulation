@@ -63,13 +63,18 @@ export function MyNavbar() {
             </div>
             <div className='hidden md:flex items-center space-x-4'>
               <NavigationMenuItem>
+                <Link href='/tool' legacyBehavior passHref>
+                  <NavigationMenuLink className='text-xl ml-6'>Tool</NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
                   <NavigationMenuLink className='text-xl ml-6'>How to use?</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href='/pricing' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl'>Pricing</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl'>Subscriptions</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -133,13 +138,18 @@ export function MyNavbar() {
             <div className='md:hidden absolute top-16 right-4 w-6/7 bg-white shadow-lg border border-gray-200 rounded-md mt-8'>
               <div className='flex flex-col space-y-2 p-4'>
                 <NavigationMenuItem>
+                  <Link href='/tool' legacyBehavior passHref>
+                    <NavigationMenuLink className='text-lg'>Tool</NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
                   <Link href='/how-to-use' legacyBehavior passHref>
                     <NavigationMenuLink className='text-lg'>How to use?</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href='/pricing' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>Pricing</NavigationMenuLink>
+                    <NavigationMenuLink className='text-lg'>Subscriptions</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
@@ -213,3 +223,4 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
 );
 ListItem.displayName = 'ListItem';
 export default MyNavbar;
+

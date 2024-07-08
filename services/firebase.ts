@@ -19,7 +19,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-const database = getDatabase(app);
 
 // Sign up
 export const signUp = async (email: string, password: string) => {
@@ -51,4 +50,5 @@ export const logOut = async (router: any) => {
   }
 };
 
-export { app as firebaseApp, database };
+export { app as firebaseApp };
+
