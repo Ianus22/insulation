@@ -50,17 +50,11 @@ async function APIDeleteThread(threadId: string | null) {
   return req.ok;
 }
 
-async function APIKeepaliveThread(threadId: string | null) {
-  if (threadId === null) return;
+async function APIGetThread(threadId: string | null) {
+  const req = await fetch(`/api/thread/get/${threadId}`);
 
-  const req = await fetch('/api/thread/keepalive', {
-    method: 'POST',
-    body: JSON.stringify({
-      threadId
-    })
-  });
-
-  return req.ok;
+  return (await req.json()) as { imageId: string; texts: string[] };
 }
 
-export { APICreateThread, APIRunThread, APIDeleteThread, APIKeepaliveThread };
+export { APICreateThread, APIRunThread, APIDeleteThread, APIGetThread };
+

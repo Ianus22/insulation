@@ -40,6 +40,8 @@ const ImageUploadComponent: React.FC = () => {
   const audioChunksRef = useRef<Blob[]>([]);
   const placeholder = '/images/placeholder.png';
 
+  const threadId = useRef<string | null>(null);
+
   let isImageValidFlag = false;
   let textStart: string = '';
 
@@ -107,27 +109,18 @@ const ImageUploadComponent: React.FC = () => {
     setIsImageValid(false);
     setIsValidating(true);
 
-    let threadId: string | null = null;
-    const currUser = getAuth().currentUser;
-    if (currUser == null) {
-      threadId = await APICreateThread(image, prompt);
-    } else {
-      await getUser(currUser.uid).then(async user => {
-        if (user != null) {
-          console.log('TODO: Check for max chat capacity');
-        }
+    const isFirstMessage = threadId.current == null;
 
-        threadId = await APICreateThread(image, prompt);
-        await createChat(currUser!.uid, threadId!);
-      });
-    }
+    if (threadId.current == null) threadId.current = await APICreateThread(image, prompt);
+
+    if (threadId.current == null) return;
 
     if (threadId == null) {
       setIsGenerating(false);
       return;
     }
 
-    await APIRunThread(threadId, prompt, text => {
+    await APIRunThread(threadId.current, isFirstMessage ? null : prompt, text => {
       if (textStart.length < 12) {
         textStart += text;
         if (textStart.length >= 12) {
@@ -421,3 +414,4 @@ const ImageUploadComponent: React.FC = () => {
 };
 
 export default ImageUploadComponent;
+
