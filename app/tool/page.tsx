@@ -337,7 +337,7 @@ const ImageUploadComponent: React.FC = () => {
                       {/*User's messages*/}
                       {i % 2 == 0 && (
                         <div className='flex flex-col space-y-4 items-end mb-5 mt-5'>
-                          <div className='bg-[#c5ece0] p-2 md:p-4 rounded-md border border-black'>
+                          <div className='bg-[#c5ece0] p-2 md:p-4 rounded-s-xl rounded-se-xl w-8/12 border border-black'>
                             <h1>{x}</h1>
                           </div>
                         </div>
@@ -345,7 +345,7 @@ const ImageUploadComponent: React.FC = () => {
 
                       {/*AI's responses*/}
                       {i % 2 == 1 && (
-                        <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black mb-5 mt-5'>
+                        <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
                           <h1>{x}</h1>
                         </div>
                       )}
@@ -354,7 +354,7 @@ const ImageUploadComponent: React.FC = () => {
 
                   {/*Current responce*/}
                   {response.length > 0 && (
-                    <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black mb-5 mt-5'>
+                    <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
                       <h1>{response}</h1>
                     </div>
                   )}
