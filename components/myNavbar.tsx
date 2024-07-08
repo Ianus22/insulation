@@ -31,6 +31,7 @@ import firebase from 'firebase/compat/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useGlobalState } from '@/hooks/globalState';
 import { languageState, useLocalization } from '@/lang/language';
+import LanguageToggle from './ui/LanguageToggle';
 
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -67,6 +68,9 @@ export function MyNavbar() {
                 </div>
               </div>
             </Link>
+            <div className='mr-2'>
+              <LanguageToggle /> {/* Move LanguageToggle here for desktop */}
+            </div>
             <div className='block md:hidden'>
               <button onClick={toggleMobileMenu} className='text-gray-700 focus:outline-none'>
                 <svg
