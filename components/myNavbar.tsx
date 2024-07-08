@@ -69,7 +69,7 @@ export function MyNavbar() {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href='/pricing' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl'>Pricing</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl'>{loc('PricingName')}</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
