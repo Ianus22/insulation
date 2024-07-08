@@ -276,10 +276,8 @@ const ImageUploadComponent: React.FC = () => {
           </div>
           <div
             className={`flex flex-col items-center ${
-              showOldChat
-                ? `w-full max-w-full h-screen border border-gray-200 ${isSidebarOpen ? 'md:ml-64' : ''}`
-                : 'w-11/12 max-w-2xl'
-            }  mx-auto p-8 rounded-lg shadow-md ml-auto`}
+              showOldChat ? `w-10/12 border border-gray-200 ${isSidebarOpen ? 'md:ml-64' : ''}` : 'w-11/12 max-w-2xl'
+            } mx-auto p-8 rounded-lg shadow-md ml-auto h-full overflow-y-auto`}
           >
             {showOldChat ? (
               <>
@@ -291,7 +289,7 @@ const ImageUploadComponent: React.FC = () => {
                         alt='placeholder'
                         width={180}
                         height={150}
-                        className='rounded-lg shadow-lg border border-black'
+                        className='rounded-lg shadow-lg border border-black w-24 md:w-52'
                       />
                     </div>
                     <div className='bg-[#c5ece0] p-2 md:p-4 rounded-md border border-black'>
@@ -299,8 +297,8 @@ const ImageUploadComponent: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className='mr-auto md:mr-auto'>
-                  <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black'>
+                <div className='mr-auto md:mr-auto flex-grow'>
+                  <div className='bg-gray-200 p-2 md:p-4 rounded-md border border-black mb-5 mt-4'>
                     <h1>Chat1-Result</h1>
                   </div>
                 </div>
