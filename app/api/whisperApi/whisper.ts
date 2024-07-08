@@ -1,15 +1,26 @@
+import axios from 'axios';
+import FormData from 'form-data';
+
 export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
-  const formData = new FormData();
-  formData.append('file', audioBlob);
+  try {
+    const formData = new FormData();
+    formData.append('file', audioBlob);
+    formData.append('model', 'whisper-1');
 
-  const response = await fetch('/api/whisperApi', {
-    method: 'POST',
-    body: formData
-  });
+    const response = await axios.post('/api/whisperApi', formData, {
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      }
+    });
 
-  if (!response.ok) {
-    throw new Error('Failed to transcribe audio');
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error:', error.response?.data || error.message);
+      throw new Error(error.response?.data || 'Failed to transcribe audio');
+    } else {
+      console.error('Unknown error:', error);
+      throw new Error('An unknown error occurred');
+    }
   }
-
-  return await response.text();
 };
