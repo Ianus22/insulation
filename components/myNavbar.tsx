@@ -53,7 +53,7 @@ export function MyNavbar() {
                     <Image src='/images/logo1.png' alt='Logo' width={100} height={40} />
                   </div>
                   <div className='ml-4 flex items-center'>
-                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold'>SmartInsulation</h1>
+                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold mr-10 md:mr-2'>SmartInsulation</h1>
                   </div>
                 </div>
               </Link>
