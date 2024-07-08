@@ -29,10 +29,16 @@ import { useEffect, useState } from 'react';
 import { auth, firebaseApp, logOut } from '@/services/llm/firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useGlobalState } from '@/hooks/globalState';
+import { languageState, useLocalization } from '@/lang/language';
 
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+  const language = useGlobalState(languageState);
+
+  const loc = useLocalization();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
@@ -63,6 +69,7 @@ export function MyNavbar() {
                 </div>
               </div>
             </Link>
+            <p onClick={() => (language.value = language.value == 'en' ? 'de' : 'en')}>{language.value}</p>
             <div className='block md:hidden'>
               <button onClick={toggleMobileMenu} className='text-gray-700 focus:outline-none'>
                 <svg
@@ -80,7 +87,7 @@ export function MyNavbar() {
               <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
                   <NavigationMenuLink className={`${navigationMenuTriggerStyle()} text-xl`}>
-                    How to use?
+                    {loc('HowToUse')}
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
@@ -190,3 +197,4 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
 );
 ListItem.displayName = 'ListItem';
 export default MyNavbar;
+
