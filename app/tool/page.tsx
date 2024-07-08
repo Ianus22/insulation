@@ -161,22 +161,11 @@ const ImageUploadComponent: React.FC = () => {
         }
       };
 
-      mediaRecorder.onstop = async () => {
+      mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         audioChunksRef.current = [];
-        try {
-          setIsValidating(true);
-          const { transcription, audioUrl } = await transcribeAudio(audioBlob);
-          setPrompt(prev => `${prev} ${transcription}`);
-          setAudioUrl(audioUrl); // Save the audio URL
-          setIsValidating(false);
-        } catch (error) {
-          if (error instanceof Error) {
-            setErrorMessage(error.message);
-          } else {
-            setErrorMessage('An unknown error occurred');
-          }
-        }
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioUrl(audioUrl);
       };
 
       mediaRecorder.start();
@@ -388,7 +377,7 @@ const ImageUploadComponent: React.FC = () => {
                     <div className='mt-4'>
                       <h3 className='text-black text-lg font-semibold'>Recorded Audio</h3>
                       <audio controls>
-                        <source src={audioUrl} type='audio/mpeg' />
+                        <source src={audioUrl} type='audio/wav' />
                         Your browser does not support the audio element.
                       </audio>
                     </div>
