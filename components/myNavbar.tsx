@@ -22,16 +22,17 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { useEffect, useState } from 'react';
-import { auth, firebaseApp, logOut } from '@/services/firebase';
-import firebase from 'firebase/compat/app';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import LanguageToggle from '@/components/languageToggle';
+import { useLocalization } from '@/lang/language';
+import { auth, logOut } from '@/services/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import LanguageToggle from '@/components/ui/LanguageToggle';
 import { useRouter } from 'next/navigation';
 
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
 
+  const loc = useLocalization();
   const router = useRouter();
 
   const toggleMobileMenu = () => {
@@ -69,7 +70,7 @@ export function MyNavbar() {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl ml-6'>How to use?</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl ml-6'>{loc('HowToUse')}</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -144,7 +145,7 @@ export function MyNavbar() {
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href='/how-to-use' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>How to use?</NavigationMenuLink>
+                    <NavigationMenuLink className='text-lg'>{loc('HowToUse')}</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
