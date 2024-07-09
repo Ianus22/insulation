@@ -23,6 +23,9 @@ const Footer = () => {
           <a href='/donation' className='block hover:underline'>
             Donations
           </a>
+          <a href='/pricing' className='block hover:underline'>
+            Subscription
+          </a>
           <a href='/contact' className='block hover:underline'>
             Contact
           </a>
@@ -114,4 +117,3 @@ function YoutubeIcon(props: any) {
 }
 
 export default Footer;
-

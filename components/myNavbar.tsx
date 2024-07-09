@@ -134,11 +134,6 @@ export function MyNavbar() {
             <div className='md:hidden absolute top-16 right-4 w-6/7 bg-white shadow-lg border border-gray-200 rounded-md mt-8'>
               <div className='flex flex-col space-y-2 p-4'>
                 <NavigationMenuItem>
-                  <Link href='/tool' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>Tool</NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
                   <Link href='/how-to-use' legacyBehavior passHref>
                     <NavigationMenuLink className='text-lg'>{loc('HowToUse')}</NavigationMenuLink>
                   </Link>
