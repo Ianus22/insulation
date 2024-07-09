@@ -64,11 +64,6 @@ export function MyNavbar() {
             </div>
             <div className='hidden md:flex items-center space-x-4'>
               <NavigationMenuItem>
-                <Link href='/tool' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl ml-6'>Tool</NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
                   <NavigationMenuLink className='text-xl ml-6'>{loc('HowToUse')}</NavigationMenuLink>
                 </Link>
@@ -224,4 +219,3 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
 );
 ListItem.displayName = 'ListItem';
 export default MyNavbar;
-
