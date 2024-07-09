@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { APIGetThread, APIRunThread, ThreadData } from '@/frontend-api/thread';
@@ -87,13 +88,14 @@ export default function ChatThread() {
       <div className='ml-auto md:ml-auto'>
         <div className='flex flex-col space-y-4 items-end'>
           <div className='relative'>
-            <Image
+            <img
               src={imageUrl}
-              alt='placeholder'
+              alt='input image'
               width={180}
               height={150}
               className='rounded-lg shadow-lg border border-black w-24 md:w-52'
-            ></Image>
+            />
+            `
           </div>
         </div>
       </div>
