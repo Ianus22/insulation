@@ -25,7 +25,7 @@ import { useEffect, useState } from 'react';
 import { useLocalization } from '@/lang/language';
 import { auth, logOut } from '@/services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import LanguageToggle from '@/components/languageToggle';
+import LanguageToggle from '@/components/ui/LanguageToggle';
 import { useRouter } from 'next/navigation';
 
 export function MyNavbar() {
@@ -145,7 +145,7 @@ export function MyNavbar() {
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href='/how-to-use' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>How to use?</NavigationMenuLink>
+                    <NavigationMenuLink className='text-lg'>{loc('HowToUse')}</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
