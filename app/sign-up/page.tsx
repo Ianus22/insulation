@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Footer from '@/components/myFooter';
 import { get, ref } from 'firebase/database';
-import { database, firebaseApp, signUp } from '@/services/llm/firebase';
+import { database, firebaseApp, signUp } from '@/services/firebase';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import MyNavbar from '@/components/myNavbar';
@@ -22,8 +22,7 @@ export default function Signup() {
     setError(null);
     try {
       const user = await signUp(email, password);
-
-      router.push('/');
+      router.back();
     } catch (error: any) {
       setError(error.message);
     }
@@ -31,8 +30,8 @@ export default function Signup() {
 
   return (
     <>
-      <MyNavbar></MyNavbar>
-      <div className='flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 max-w-xl mx-auto shadow-lg mt-6'>
+      <MyNavbar />
+      <div className='flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 max-w-xl mx-auto shadow-lg mt-6 mb-10'>
         <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
           <div className='flex items-center justify-center'>
             <Image src='/images/logo1.png' alt='Logo' width={150} height={40} />

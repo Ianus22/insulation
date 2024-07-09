@@ -22,17 +22,18 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { useEffect, useState } from 'react';
-import firebase from 'firebase/compat/app';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { auth, logOut } from '@/services/llm/firebase';
-import LanguageToggle from './ui/LanguageToggle';
 import { useLocalization } from '@/lang/language';
+import { auth, logOut } from '@/services/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import LanguageToggle from '@/components/languageToggle';
+import { useRouter } from 'next/navigation';
 
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   const loc = useLocalization();
+  const router = useRouter();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
@@ -56,12 +57,17 @@ export function MyNavbar() {
                     <Image src='/images/logo1.png' alt='Logo' width={100} height={40} />
                   </div>
                   <div className='ml-4 flex items-center'>
-                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold'>SmartInsulation</h1>
+                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold mr-10 md:mr-2'>SmartInsulation</h1>
                   </div>
                 </div>
               </Link>
             </div>
             <div className='hidden md:flex items-center space-x-4'>
+              <NavigationMenuItem>
+                <Link href='/tool' legacyBehavior passHref>
+                  <NavigationMenuLink className='text-xl ml-6'>Tool</NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
                   <NavigationMenuLink className='text-xl ml-6'>{loc('HowToUse')}</NavigationMenuLink>
@@ -69,7 +75,7 @@ export function MyNavbar() {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href='/pricing' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl'>{loc('PricingName')}</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl'>Subscriptions</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -100,7 +106,7 @@ export function MyNavbar() {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => {
-                            logOut();
+                            logOut(router);
                           }}
                           className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                         >
@@ -133,13 +139,18 @@ export function MyNavbar() {
             <div className='md:hidden absolute top-16 right-4 w-6/7 bg-white shadow-lg border border-gray-200 rounded-md mt-8'>
               <div className='flex flex-col space-y-2 p-4'>
                 <NavigationMenuItem>
+                  <Link href='/tool' legacyBehavior passHref>
+                    <NavigationMenuLink className='text-lg'>Tool</NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
                   <Link href='/how-to-use' legacyBehavior passHref>
                     <NavigationMenuLink className='text-lg'>How to use?</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href='/pricing' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>Pricing</NavigationMenuLink>
+                    <NavigationMenuLink className='text-lg'>Subscriptions</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
@@ -170,7 +181,7 @@ export function MyNavbar() {
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => {
-                              logOut();
+                              logOut(router);
                             }}
                             className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                           >

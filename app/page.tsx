@@ -69,7 +69,7 @@ export default function Home() {
       </div>
       {/* --- See it Clearly --- */}
       {/* --- About us --- Nikolay */}
-      <div className='relative w-full h-64 rounded-lg shadow-md overflow-hidden max-w-sm sm:max-w-5xl mx-auto'>
+      <div className='relative w-full h-64 rounded-lg shadow-md overflow-hidden max-w-sm sm:max-w-5xl mx-auto mb-10'>
         <Image src={img1} alt='img1' layout='fill' objectFit='cover' className='rounded-lg shadow-lg' />
         <div className='absolute inset-0 flex items-center justify-center md:justify-end md:p-8'>
           <div className=' w-full md:w-1/2 p-8 md:p-2 rounded-lg shadow-lg bg-white bg-opacity-55 max-w-xs'>
