@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserIdFromRequest } from '@/services/auth';
 import { runThread } from '@/services/llm/thread';
 
+export const config = {
+  maxDuration: 60
+};
 export async function POST(req: NextRequest) {
   let data: any = null;
   try {
@@ -29,4 +32,3 @@ export async function POST(req: NextRequest) {
 
   return new NextResponse(stream);
 }
-
