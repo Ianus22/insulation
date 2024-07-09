@@ -104,7 +104,8 @@ async function getThread(threadId: string) {
 
 async function getImage(imageId: string) {
   const res = await OPENAI.files.content(imageId);
-  return [await res.arrayBuffer(), res.headers] as const;
+  return [res.body, res.headers] as const;
 }
 
 export { beginThread, runThread, deleteThread, getThread, getImage };
+
