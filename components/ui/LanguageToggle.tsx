@@ -1,27 +1,20 @@
 'use client';
 
+import { useGlobalState } from '@/hooks/globalState';
 import React, { useState, useEffect } from 'react';
+import { languageState } from '@/lang/language';
 import Image from 'next/image';
 
 const LanguageToggle: React.FC = () => {
-  const [isEnglish, setIsEnglish] = useState(true);
+  const language = useGlobalState(languageState);
 
-  useEffect(() => {
-    const storedLanguage = localStorage.getItem('language');
-    if (storedLanguage) {
-      setIsEnglish(storedLanguage === 'en');
-    }
-  }, []);
+  const isEnglish = language.value == 'en';
 
-  const toggleLanguage = () => {
-    const newLanguage = isEnglish ? 'de' : 'en';
-    setIsEnglish(!isEnglish);
-    localStorage.setItem('language', newLanguage);
-  };
+  const toggleLanguage = () => (language.value = isEnglish ? 'de' : 'en');
 
   return (
     <div
-      className='relative w-16 h-8 flex items-center bg-slate-300 rounded-full p-1 cursor-pointer'
+      className='relative w-16 h-8 flex items-center bg-slate-300 rounded-full p-1 cursor-pointer select-none'
       onClick={toggleLanguage}
     >
       <div
@@ -40,3 +33,4 @@ const LanguageToggle: React.FC = () => {
 };
 
 export default LanguageToggle;
+

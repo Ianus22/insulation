@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 const Footer = () => {
   return (
-    <footer className='bg-[#d1f2eb] text-[#5d6d7e] pt-8 mt-auto'>
+    <footer className='bg-[#d1f2eb] text-[#5d6d7e] pt-8'>
       <div className='container mx-auto flex  items-center'>
         <div className='w-full'>
           <p className='text-lg'>&copy; 2024 SmartInsulation</p>
@@ -114,3 +114,4 @@ function YoutubeIcon(props: any) {
 }
 
 export default Footer;
+

@@ -1,8 +1,8 @@
-export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
+export const APITranscribeAudio = async (audioBlob: Blob): Promise<string> => {
   const formData = new FormData();
   formData.append('file', audioBlob);
 
-  const response = await fetch('/api/whisperApi', {
+  const response = await fetch('/api/whisper', {
     method: 'POST',
     body: formData
   });
@@ -13,3 +13,4 @@ export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
 
   return await response.text();
 };
+
