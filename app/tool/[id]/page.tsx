@@ -95,7 +95,6 @@ export default function ChatThread() {
               height={150}
               className='rounded-lg shadow-lg border border-black w-24 md:w-52'
             />
-            `
           </div>
         </div>
       </div>
