@@ -21,7 +21,7 @@ export default function Signin() {
       const user = await signIn(email, password);
       router.back();
     } catch (error: any) {
-      setError('Invalid email or password. Please try again.');
+      setError(error.message.includes('verified') ? error.message : 'Invalid email or password.');
     }
   };
 
@@ -112,3 +112,4 @@ export default function Signin() {
     </>
   );
 }
+

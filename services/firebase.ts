@@ -24,6 +24,7 @@ export const auth = getAuth(app);
 export const signUp = async (email: string, password: string) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await signOut(auth);
     return userCredential.user;
   } catch (error) {
     throw error;
@@ -32,12 +33,12 @@ export const signUp = async (email: string, password: string) => {
 
 // Sign in
 export const signIn = async (email: string, password: string) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    throw error;
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  if (!userCredential.user.emailVerified) {
+    await signOut(auth);
+    throw new Error('Email is not verified!');
   }
+  return userCredential.user;
 };
 
 // Sign out
