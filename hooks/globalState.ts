@@ -11,6 +11,7 @@ function createGlobalState<T>(defaultValue: T): GlobalState<T> {
   return {
     listeners: new Set(),
     set value(newValue: T) {
+      if (value === newValue) return;
       value = newValue;
       for (const listener of this.listeners) listener();
     },

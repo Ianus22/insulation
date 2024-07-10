@@ -24,6 +24,8 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 
+import { useLocalization } from '@/lang/language';
+
 const formatNumber = (n: number) => (n < 10 ? `0${n}` : n.toString());
 
 const formatDate = (date: Date) =>
@@ -35,6 +37,7 @@ const Pricing = () => {
   const [subscription, setSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const loc = useLocalization();
   const router = useRouter();
 
   const loadSubscription = async () => {
@@ -90,7 +93,7 @@ const Pricing = () => {
       <MyNavbar></MyNavbar>
       <div className='max-w-7x w-screen l mx-auto px-4 sm:px-6 lg:px-8 py-12 flex items-center flex-col'>
         <div className='text-center'>
-          <h2 className='text-3xl font-extrabold text-gray-900 sm:text-4xl'>Subscriptions</h2>
+          <h2 className='text-3xl font-extrabold text-gray-900 sm:text-4xl'>{loc('lb_Subscriptions')}</h2>
         </div>
         {loading ? (
           <Spinner className='mt-16' />
@@ -107,80 +110,77 @@ const Pricing = () => {
             </p>
             <AlertDialog>
               <AlertDialogTrigger className='bg-red-500 text-xl py-2 px-4 square-lg rounded-lg'>
-                Cancel
+                {loc('dlbx_CancelSubscrioptionOption')}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>Are you sure you want to cancel your subscription</AlertDialogDescription>
+                  <AlertDialogTitle>{loc('dlbxTitle_LogoutConfirmation')}</AlertDialogTitle>
+                  <AlertDialogDescription>{loc('dlbx_SubscriptionConformation')}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Close</AlertDialogCancel>
+                  <AlertDialogCancel>{loc('dlbx_ConfirmSubscitptionOption')}</AlertDialogCancel>
                   <AlertDialogAction onClick={cancel} className='bg-red-500 text-black'>
-                    Cancel
+                    {loc('dlbx_CancelSubscrioptionOption')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            {/* <button className=' text-black py-2 px-4 rounded bg-red-500' onClick={cancel}>
-              Cancel
-            </button> */}
           </div>
         ) : (
           <div className='mt-10 flex flex-row flex-wrap gap-6 justify-center items-stretch'>
             <div className='min-w-[300px] gap-6 flex flex-col justify-between bg-white shadow-lg rounded-lg overflow-hidden w-full sm:w-1/3 p-6 flex-1 border'>
               <div>
-                <h3 className='text-xl font-semibold text-gray-900'>Free trial*</h3>
+                <h3 className='text-xl font-semibold text-gray-900'>{loc('lb_sb1_Title')}</h3>
                 <p className='mt-4 text-4xl font-extrabold text-gray-900'>
-                  €0 <span className='text-lg font-medium text-gray-500'>/ month</span>
+                  {loc('lb_sb1_Price')} <span className='text-lg font-medium text-gray-500'>{loc('lb_sb1_Duration')}</span>
                 </p>
                 <ul className='mt-6 space-y-4 text-gray-600'>
-                  <li>3 free tries</li>
-                  <li>limited result</li>
+                  <li>{loc('lb_sb1_FirstChar')}</li>
+                  <li>{loc('lb_sb1_SecondChar')}</li>
                 </ul>
               </div>
               <button className=' text-black py-2 px-4 rounded bg-[#c5ece0]' onClick={() => buy(SubscriptionType.Free)}>
-                Select
+                {loc('lb_sb_SelectButton')}
               </button>
             </div>
             <div className='min-w-[300px] flex flex-col gap-6 justify-between bg-white shadow-lg rounded-lg overflow-hidden w-full sm:w-1/3 p-6 flex-1 border'>
               <div>
-                <h3 className='text-xl font-semibold text-gray-900'>Monthly subscription</h3>
+                <h3 className='text-xl font-semibold text-gray-900'>{loc('lb_sb2_Title')}</h3>
                 <p className='mt-4 text-4xl font-extrabold text-gray-900'>
-                  €14.99 <span className='text-lg font-medium text-gray-500'>/ month</span>
+                  {loc('lb_sb2_Price')} <span className='text-lg font-medium text-gray-500'>{loc('lb_sb2_Duration')}</span>
                 </p>
                 <ul className='mt-6 space-y-4 text-gray-600'>
-                  <li>Unlimited conversations</li>
-                  <li>Accurate and full answers</li>
-                  <li>Chat history</li>
-                  <li>Continuing old chats</li>
+                  <li>{loc('lb_sb2_sb3_FirstChar')}</li>
+                  <li>{loc('lb_sb2_sb3_SecondChar')}</li>
+                  <li>{loc('lb_sb2_sb3_ThirdChar')}</li>
+                  <li>{loc('lb_sb2_sb3_FourthChar')}</li>
                 </ul>
               </div>
               <button
                 className=' text-black py-2 px-4 rounded bg-[#c5ece0]'
                 onClick={() => buy(SubscriptionType.Monthly)}
               >
-                Select
+                {loc('lb_sb_SelectButton')}
               </button>
             </div>
             <div className='min-w-[300px] gap-6 pb-6 flex flex-col justify-between bg-white shadow-lg rounded-lg overflow-hidden w-full sm:w-1/3 p-6 flex-1 border'>
               <div>
-                <h3 className='text-xl font-semibold text-gray-900'>Annual subscription</h3>
+                <h3 className='text-xl font-semibold text-gray-900'>{loc('lb_sb3_Title')}</h3>
                 <p className='mt-4 text-4xl font-extrabold text-gray-900'>
-                  €99 <span className='text-lg font-medium text-gray-500'>/ year</span>
+                  {loc('lb_sb3_Price')} <span className='text-lg font-medium text-gray-500'>{loc('lb_sb3_Duration')}</span>
                 </p>
                 <ul className='mt-6 space-y-4 text-gray-600'>
-                  <li>Unlimited conversations</li>
-                  <li>Accurate and full answers</li>
-                  <li>Chat history</li>
-                  <li>Continuing old chats</li>
+                  <li>{loc('lb_sb2_sb3_FirstChar')}</li>
+                  <li>{loc('lb_sb2_sb3_SecondChar')}</li>
+                  <li>{loc('lb_sb2_sb3_ThirdChar')}</li>
+                  <li>{loc('lb_sb2_sb3_FourthChar')}</li>
                 </ul>
               </div>
               <button
                 className=' text-black py-2 px-4 rounded bg-[#c5ece0]'
                 onClick={() => buy(SubscriptionType.Yearly)}
               >
-                Select
+                {loc('lb_sb_SelectButton')}
               </button>
             </div>
           </div>
