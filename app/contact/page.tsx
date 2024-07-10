@@ -8,7 +8,7 @@ const ContactPage: React.FC = () => {
   return (
     <>
       <MyNavbar />
-      <div className='flex flex-col items-center min-h-screen mt-6'>
+      <div className='flex flex-col items-center min-h-screen my-6'>
         <div className='bg-gray-100 shadow-md rounded-lg p-6 w-full max-w-4xl'>
           <h1 className='text-2xl font-semibold text-center text-black'>Get in Touch</h1>
           <div className='flex flex-col md:flex-row justify-between items-center mt-6'>

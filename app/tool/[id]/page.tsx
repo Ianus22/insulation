@@ -1,165 +1,141 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { APICreateThread, APIDeleteThread, APIRunThread } from '@/frontend-api/thread';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import MyNavbar from '@/components/myNavbar';
-import Footer from '@/components/myFooter';
-import Markdown from 'react-markdown';
-import Image from 'next/image';
-import Spinner from '@/components/ui/Spinner';
-import { firebaseApp } from '@/services/llm/firebase';
-import { getAuth } from 'firebase/auth';
-import { getUser, createChat, getChats } from '@/services/database';
+import { APIGetThread, APIRunThread, ThreadData } from '@/frontend-api/thread';
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { ToolDataContext } from '../toolData';
 import { useParams } from 'next/navigation';
-import { getMessages } from '@/services/llm/thread';
+import { auth } from '@/services/firebase';
+import Image from 'next/image';
 
-const ImageUploadComponent: React.FC = () => {
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+export default function ChatThread() {
+  const toolData = useContext(ToolDataContext);
+
+  const { id: chatId }: { id: string } = useParams();
+
+  const [chatData, setChatData] = useState<ThreadData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isValidating, setIsValidating] = useState(false);
-  const [isImageValid, setIsImageValid] = useState(false);
-  const [image, setImage] = useState<File | null>(null);
-  const [response, setResponse] = useState<string>('');
-  const [prompt, setPrompt] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [response, setResponse] = useState('');
+  const [prompt, setPrompt] = useState('');
 
-  const { id: threadId } = useParams() as { id: string };
-
-  let textStart: string = '';
-
-  let isImageValidFlag = false;
-
-  const selectorRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
-    if (image == null) {
-      setImagePreviewUrl(null);
-      return;
-    }
+    auth.authStateReady().then(() => {
+      if (toolData.transferredChat?.id === chatId || auth.currentUser == null) return;
 
-    const reader = new FileReader();
-    reader.readAsDataURL(image);
+      APIGetThread(auth.currentUser, chatId).then(setChatData);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatId]);
 
-    const onImageLoaded = () => setImagePreviewUrl(reader.result as string);
-    reader.addEventListener('load', onImageLoaded, { once: true });
+  useEffect(() => {
+    const chat = toolData.transferredChat;
+    if (chat == null || chat.id !== chatId) return;
 
-    setIsValidating(true);
-    const timer = setTimeout(() => {
-      setIsValidating(false);
-      setIsImageValid(true);
-      if (prompt == null || prompt.length == 0)
-        setPrompt('What is the best way to insulate and fireproof the area shown in the image given above?');
-    }, 500);
+    setIsGenerating(!chat.isDone);
+    setResponse(chat.response);
 
-    return () => reader.removeEventListener('load', onImageLoaded);
-  }, [image, prompt]);
+    setChatData({
+      imageId: '',
+      texts: [chat.prompt]
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toolData.transferredChat]);
 
-  const removeImage = () => {
-    setImage(null);
-    setImagePreviewUrl(null);
-    setIsImageValid(false);
-    setIsValidating(false);
-    setErrorMessage('');
-  };
+  const imageUrl = useMemo(
+    () =>
+      toolData.transferredChat?.id === chatId
+        ? toolData.transferredChat.imagePreviewUrl
+        : `/api/thread/image/${chatData?.imageId}`,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [toolData.transferredChat, chatData]
+  );
 
   const submit = async () => {
-    if (!canClickButton || !image) return;
-    setIsGenerating(true);
+    if (isGenerating || auth.currentUser == null) return;
 
-    await APIRunThread(threadId, prompt, text => {
-      if (textStart.length < 12) {
-        textStart += text;
-        if (text.length >= 12) {
-          if (text.startsWith('Bad Request:')) {
-            setIsImageValid(false);
-            isImageValidFlag = false;
-            setIsValidating(false);
-          } else {
-            setIsImageValid(true);
-            isImageValidFlag = true;
-            setIsValidating(false);
-            setResponse(res => res + text);
-          }
-        }
-      } else {
-        if (isImageValidFlag) setResponse(res => res + text);
-        else setErrorMessage(error => error + text);
-      }
-    });
+    setIsGenerating(true);
+    setPrompt('');
+
+    setChatData(data => ({
+      imageId: data?.imageId ?? '',
+      texts: [...(data?.texts ?? []), prompt]
+    }));
+
+    await APIRunThread(auth.currentUser, chatId, prompt, text => setResponse(res => res + text));
+
     setIsGenerating(false);
   };
 
-  const imageBorderColor = useMemo(() => {
-    return imagePreviewUrl == null || isValidating
-      ? 'border-gray-300'
-      : isImageValid
-      ? 'border-green-300'
-      : 'border-red-300';
-  }, [imagePreviewUrl, isImageValid, isValidating]);
+  useEffect(() => {
+    if (isGenerating) return;
 
-  const canClickButton = useMemo(
-    () => image != null && !isGenerating && isImageValid,
-    [image, isGenerating, isImageValid]
-  );
+    setResponse('');
+
+    setChatData(data => ({
+      imageId: data?.imageId ?? '',
+      texts: [...(data?.texts ?? []), response]
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isGenerating]);
 
   return (
-    <>
-      <MyNavbar />
-      <div className='flex flex-col items-center w-full max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-md'>
-        <input
-          type='file'
-          accept='image/png, image/jpeg, image/jpg'
-          ref={selectorRef}
-          onChange={e => setImage(e.target.files![0])}
-          className='hidden'
-        />
-        <div
-          className={`w-full p-8 mb-8 border-2 border-dashed ${imageBorderColor} rounded-lg bg-gray-50 flex flex-col items-center justify-center cursor-pointer`}
-          onClick={() => selectorRef.current!.click()}
-        >
-          {imagePreviewUrl == null ? (
-            <Image src='/images/downloadSign.png' alt='download' height={120} width={120} />
-          ) : (
-            <Image src={imagePreviewUrl} alt='Uploaded Image' height={120} width={120} />
-          )}
-          <p className='text-gray-400 mt-4'>Drag and drop or click here to upload image</p>
-          {errorMessage && <div className='mt-4 p-3 bg-red-100 text-red-600 rounded'>{errorMessage}</div>}
-          {image && (
-            <button className='mt-4 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-700' onClick={removeImage}>
-              Remove Image
-            </button>
-          )}
-        </div>
-        <div className='w-full relative mb-8'>
-          <textarea
-            placeholder='Additional prompt'
-            className='w-full p-4 border border-gray-300 rounded-lg focus:outline-none'
-            value={prompt}
-            onChange={e => setPrompt(e.target.value)}
-          />
-          {isValidating && (
-            <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-75'>
-              <Spinner />
-            </div>
-          )}
-        </div>
-        <button
-          className={`w-full py-3 mb-8 bg-[#C5ECE0] text-black rounded-lg${
-            canClickButton ? ' hover:bg-green-200 cursor-pointer' : ' hover:bg-[#C5ECE0] cursor-default'
-          }`}
-          onClick={submit}
-        >
-          Submit
-        </button>
-        <div className='w-full p-6 border border-gray-300 rounded-lg bg-gray-50'>
-          <h2 className='text-black text-lg font-semibold mb-4'>Result</h2>
-          <div className='w-full p-4 border border-gray-300 rounded-lg bg-white'>
-            <Markdown className='text-gray-400'>{response === '' ? 'Returned result' : response}</Markdown>
+    <div
+      className={`flex flex-col items-center ${`w-10/12 border border-gray-200 overflow-y-scroll h-[35rem] ${
+        toolData.isSidebarOpen ? 'md:ml-64' : ''
+      }`} mx-auto p-8 rounded-lg shadow-md ml-auto  overflow-y-auto`}
+    >
+      <div className='ml-auto md:ml-auto'>
+        <div className='flex flex-col space-y-4 items-end'>
+          <div className='relative'>
+            <img
+              src={imageUrl}
+              alt='input image'
+              width={180}
+              height={150}
+              className='rounded-lg shadow-lg border border-black w-24 md:w-52'
+            />
           </div>
         </div>
       </div>
-      <Footer />
-    </>
-  );
-};
+      <div className='ml-auto md:ml-auto'>
+        {chatData?.texts.map((x, i) => (
+          <div key={i}>
+            {i % 2 == 0 && (
+              <div className='flex flex-col space-y-4 items-end mb-5 mt-5'>
+                <div className='bg-[#c5ece0] p-2 md:p-4 rounded-s-xl rounded-se-xl w-8/12 border border-black'>
+                  <h1>{x}</h1>
+                </div>
+              </div>
+            )}
 
-export default ImageUploadComponent;
+            {i % 2 == 1 && (
+              <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
+                <ReactMarkdown>{x}</ReactMarkdown>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {response.length > 0 && (
+          <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
+            <ReactMarkdown>{response}</ReactMarkdown>
+          </div>
+        )}
+      </div>
+
+      <div className='flex mt-auto space-x-2 w-full items-end'>
+        <input
+          value={prompt}
+          type='text'
+          placeholder='Type your message here...'
+          className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none'
+          onChange={e => setPrompt(e.target.value)}
+        />
+        <button className='py-2 px-4 bg-[#c5ece0] rounded-lg hover:bg-green-200 text-black' onClick={submit}>
+          Send
+        </button>
+      </div>
+    </div>
+  );
+}

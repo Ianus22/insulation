@@ -22,13 +22,18 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { useEffect, useState } from 'react';
-import { auth, logOut } from '@/services/llm/firebase';
+import { useLocalization } from '@/lang/language';
+import { auth, logOut } from '@/services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import LanguageToggle from '@/components/languageToggle';
+import LanguageToggle from '@/components/ui/LanguageToggle';
+import { useRouter } from 'next/navigation';
 
 export function MyNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+  const loc = useLocalization();
+  const router = useRouter();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
@@ -52,7 +57,7 @@ export function MyNavbar() {
                     <Image src='/images/logo1.png' alt='Logo' width={100} height={40} />
                   </div>
                   <div className='ml-4 flex items-center'>
-                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold'>SmartInsulation</h1>
+                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold mr-10 md:mr-2'>SmartInsulation</h1>
                   </div>
                 </div>
               </Link>
@@ -60,12 +65,12 @@ export function MyNavbar() {
             <div className='hidden md:flex items-center space-x-4'>
               <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl ml-6'>How to use?</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl ml-6'>{loc('HowToUse')}</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href='/pricing' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl'>Pricing</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl'>Subscriptions</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -96,7 +101,7 @@ export function MyNavbar() {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => {
-                            logOut();
+                            logOut(router);
                           }}
                           className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                         >
@@ -130,12 +135,12 @@ export function MyNavbar() {
               <div className='flex flex-col space-y-2 p-4'>
                 <NavigationMenuItem>
                   <Link href='/how-to-use' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>How to use?</NavigationMenuLink>
+                    <NavigationMenuLink className='text-lg'>{loc('HowToUse')}</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href='/pricing' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>Pricing</NavigationMenuLink>
+                    <NavigationMenuLink className='text-lg'>Subscriptions</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
@@ -166,7 +171,7 @@ export function MyNavbar() {
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => {
-                              logOut();
+                              logOut(router);
                             }}
                             className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                           >
