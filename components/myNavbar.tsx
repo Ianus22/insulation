@@ -57,7 +57,7 @@ export function MyNavbar() {
                     <Image src='/images/logo1.png' alt='Logo' width={100} height={40} />
                   </div>
                   <div className='ml-4 flex items-center'>
-                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold mr-10 md:mr-2'>SmartInsulation</h1>
+                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold mr-10 md:mr-2'>{loc('lb_nvb_WebLogo')}</h1>
                   </div>
                 </div>
               </Link>
@@ -70,24 +70,24 @@ export function MyNavbar() {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl ml-6'>{loc('HowToUse')}</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl ml-6'>{loc('btn_nvb_HowToUse')}</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href='/pricing' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl'>Subscriptions</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl'>{loc('btn_nvb_Subscriptions')}</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href='/contact' legacyBehavior passHref>
-                  <NavigationMenuLink className='text-xl'>Contact</NavigationMenuLink>
+                  <NavigationMenuLink className='text-xl'>{loc('btn_nvb_Contacts')}</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               {!isSignedIn ? (
                 <Link href='/sign-in'>
                   <NavigationMenuItem>
                     <Button variant='outline' className='bg-[#C5ECE0] hover:bg-green-200 text-xl py-2 px-4 square-lg'>
-                      Sign in
+                      {loc('btn_nvb_SignIn')}
                     </Button>
                   </NavigationMenuItem>
                 </Link>
@@ -95,22 +95,22 @@ export function MyNavbar() {
                 <NavigationMenuItem>
                   <AlertDialog>
                     <AlertDialogTrigger className='bg-[#C5ECE0] hover:bg-green-200 text-xl py-2 px-4 square-lg rounded-lg'>
-                      Logout
+                      {loc('btn_nvb_Logout')}
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>Are you sure you want to log out</AlertDialogDescription>
+                        <AlertDialogTitle>{loc('dlbxTitle_LogoutConfirmation')}</AlertDialogTitle>
+                        <AlertDialogDescription>{loc('dlbx_LogoutConfirmation')}</AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{loc('dlbx_CancelOption')}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => {
                             logOut(router);
                           }}
                           className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                         >
-                          Logout
+                          {loc('dlbx_ConfirmOption')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -145,24 +145,24 @@ export function MyNavbar() {
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href='/how-to-use' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>{loc('HowToUse')}</NavigationMenuLink>
+                    <NavigationMenuLink className='text-lg'>{loc('btn_nvb_HowToUse')}</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href='/pricing' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>Subscriptions</NavigationMenuLink>
+                    <NavigationMenuLink className='text-lg'>{loc('btn_nvb_Subscriptions')}</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href='/contact' legacyBehavior passHref>
-                    <NavigationMenuLink className='text-lg'>Contact</NavigationMenuLink>
+                    <NavigationMenuLink className='text-lg'>{loc('btn_nvb_Contacts')}</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 {!isSignedIn ? (
                   <Link href='/sign-in'>
                     <NavigationMenuItem>
                       <Button variant='outline' className='bg-[#C5ECE0] hover:bg-green-200 text-lg py-2 px-4 square-lg'>
-                        Sign in
+                        {loc('btn_nvb_SignIn')}
                       </Button>
                     </NavigationMenuItem>
                   </Link>
@@ -170,22 +170,22 @@ export function MyNavbar() {
                   <NavigationMenuItem>
                     <AlertDialog>
                       <AlertDialogTrigger className='bg-[#C5ECE0] hover:bg-green-200 text-lg py-2 px-4 square-lg rounded-lg'>
-                        Logout
+                        {loc('btn_nvb_Logout')}
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>Are you sure you want to log out</AlertDialogDescription>
+                          <AlertDialogTitle>{loc('dlbxTitle_LogoutConfirmation')}</AlertDialogTitle>
+                          <AlertDialogDescription>{loc('dlbx_LogoutConfirmation')}</AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogCancel>{loc('dlbx_CancelOption')}</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => {
                               logOut(router);
                             }}
                             className='bg-[#C5ECE0] hover:bg-green-200 text-black'
                           >
-                            Logout
+                            {loc('dlbx_ConfirmOption')}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -223,5 +223,6 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
   }
 );
 ListItem.displayName = 'ListItem';
+
 export default MyNavbar;
 

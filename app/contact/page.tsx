@@ -1,16 +1,22 @@
-import React from 'react';
+'use client';
+
+import React, { use } from 'react';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
 import Map from './Map/Map';
 import ContactForm from './ContactForm/ContactForm';
 
+import { useLocalization } from '@/lang/language';
+
 const ContactPage: React.FC = () => {
+  const loc = useLocalization();
+
   return (
     <>
       <MyNavbar />
       <div className='flex flex-col items-center min-h-screen mt-6'>
         <div className='bg-gray-100 shadow-md rounded-lg p-6 w-full max-w-4xl'>
-          <h1 className='text-2xl font-semibold text-center text-black'>Get in Touch</h1>
+          <h1 className='text-2xl font-semibold text-center text-black'>{loc('lb_ct_Title')}</h1>
           <div className='flex flex-col md:flex-row justify-between items-center mt-6'>
             <div className='flex flex-col items-start mb-4 md:mb-0 md:mr-4'>
               <div className='flex items-center mb-4'>
@@ -29,7 +35,7 @@ const ContactPage: React.FC = () => {
                     fill='currentColor'
                   ></path>
                 </svg>
-                <span className='ml-2 text-gray-700'>Rienößlgasse 3, Wien</span>
+                <span className='ml-2 text-gray-700'>{loc('lb_ct_Adress')}</span>
               </div>
               <div className='flex items-center mb-4'>
                 <svg
@@ -48,7 +54,7 @@ const ContactPage: React.FC = () => {
                     fill='transparent'
                   ></path>
                 </svg>
-                <span className='ml-2 text-gray-700'>+359 58 331 24</span>
+                <span className='ml-2 text-gray-700'>{loc('lb_ct_Telephone')}</span>
               </div>
               <Map />
             </div>
