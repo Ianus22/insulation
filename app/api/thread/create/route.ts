@@ -37,7 +37,12 @@ export async function POST(req: NextRequest) {
 
   if (userId == null) return new Response('Unauthorized', { status: 401 });
 
-  const image = formData.get('image') as File | undefined;
+  let image: File | undefined;
+  try {
+    image = formData.get('image') as File | undefined;
+  } catch (e) {
+    return new NextResponse('File is too large', { status: 413 });
+  }
   if (image == null) return new NextResponse('No files received.', { status: 400 });
 
   const prompt = (formData.get('prompt') as string | undefined) ?? '';
@@ -62,4 +67,3 @@ export async function POST(req: NextRequest) {
     id: threadId
   });
 }
-
