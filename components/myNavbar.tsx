@@ -57,12 +57,14 @@ export function MyNavbar() {
                     <Image src='/images/logo1.png' alt='Logo' width={100} height={40} />
                   </div>
                   <div className='ml-4 flex items-center'>
-                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold mr-10 md:mr-2'>{loc('lb_nvb_WebLogo')}</h1>
+                    <h1 className='text-xl md:text-3xl text-slate-950 font-bold mr-10 md:mr-2'>
+                      {loc('lb_nvb_WebLogo')}
+                    </h1>
                   </div>
                 </div>
               </Link>
             </div>
-            <div className='hidden md:flex items-center space-x-4'>
+            <div className='hidden lg:flex items-center space-x-4'>
               <NavigationMenuItem>
                 <Link href='/how-to-use' legacyBehavior passHref>
                   <NavigationMenuLink className='text-xl ml-6'>{loc('btn_nvb_HowToUse')}</NavigationMenuLink>
@@ -78,6 +80,10 @@ export function MyNavbar() {
                   <NavigationMenuLink className='text-xl'>{loc('btn_nvb_Contacts')}</NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
+
+              <div className=' mr-2'>
+                <LanguageToggle /> {/* Move LanguageToggle here for desktop */}
+              </div>
               {!isSignedIn ? (
                 <Link href='/sign-in'>
                   <NavigationMenuItem>
@@ -112,11 +118,8 @@ export function MyNavbar() {
                   </AlertDialog>
                 </NavigationMenuItem>
               )}
-              <div className='mr-2'>
-                <LanguageToggle /> {/* Move LanguageToggle here for desktop */}
-              </div>
             </div>
-            <div className='flex items-center md:hidden'>
+            <div className='flex items-center lg:hidden'>
               <button onClick={toggleMobileMenu} className='text-gray-700 focus:outline-none'>
                 <svg
                   className='w-6 h-6'
@@ -131,7 +134,7 @@ export function MyNavbar() {
             </div>
           </div>
           {isMobileMenuOpen && (
-            <div className='md:hidden absolute top-16 right-4 w-6/7 bg-white shadow-lg border border-gray-200 rounded-md mt-8'>
+            <div className='lg:hidden absolute top-16 right-4 w-6/7 bg-white shadow-lg border border-gray-200 rounded-md mt-8'>
               <div className='flex flex-col space-y-2 p-4'>
                 <NavigationMenuItem>
                   <Link href='/how-to-use' legacyBehavior passHref>

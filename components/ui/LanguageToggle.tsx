@@ -14,7 +14,7 @@ const LanguageToggle: React.FC = () => {
 
   return (
     <div
-      className='relative w-16 h-8 flex items-center bg-slate-300 rounded-full p-1 cursor-pointer select-none'
+      className='relative ml-auto w-16 h-8 flex items-center bg-slate-300 rounded-full p-1 cursor-pointer select-none'
       onClick={toggleLanguage}
     >
       <div
@@ -33,4 +33,3 @@ const LanguageToggle: React.FC = () => {
 };
 
 export default LanguageToggle;
-
