@@ -3,6 +3,8 @@
 import { APICreateThread, APIDeleteThread, APIRunThread } from '@/frontend-api/thread';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { APITranscribeAudio } from '@/frontend-api/whisper';
+import { useGlobalState } from '@/hooks/globalState';
+import { languageState } from '@/lang/language';
 import { FaMicrophone } from 'react-icons/fa6';
 import Spinner from '@/components/ui/Spinner';
 import { ToolDataContext } from './toolData';
@@ -13,6 +15,8 @@ import Image from 'next/image';
 export default function CreateThread() {
   const toolData = useContext(ToolDataContext);
   const router = useRouter();
+
+  const language = useGlobalState(languageState);
 
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
@@ -112,7 +116,6 @@ export default function CreateThread() {
           setIsImageValid(true);
           toolData.addChat(thread);
           router.push(`/tool/${thread.id}`);
-          // Add data
         }
 
         isDoneValidating = true;
@@ -164,7 +167,7 @@ export default function CreateThread() {
         setAudioUrl(audioUrl);
         try {
           setIsValidating(true);
-          const transcribedText = await APITranscribeAudio(audioBlob);
+          const transcribedText = await APITranscribeAudio(audioBlob, language.value);
           setPrompt(prev => `${prev} ${transcribedText}`);
           setIsValidating(false);
         } catch (error) {
@@ -264,3 +267,4 @@ export default function CreateThread() {
     </div>
   );
 }
+

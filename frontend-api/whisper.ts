@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-export const APITranscribeAudio = async (audioBlob: Blob): Promise<string> => {
+export const APITranscribeAudio = async (audioBlob: Blob, lang: string): Promise<string> => {
   try {
     const formData = new FormData();
     formData.append('file', audioBlob);
+    formData.append('lang', lang);
 
     const response = await fetch('/api/whisper', {
       method: 'POST',
@@ -21,3 +22,4 @@ export const APITranscribeAudio = async (audioBlob: Blob): Promise<string> => {
     }
   }
 };
+
