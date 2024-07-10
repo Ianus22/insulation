@@ -22,6 +22,17 @@ const de: Translations = {
 
   txt_ContentDescription: "Laden Sie Ihr Wandbild hoch und erhalten Sie KI-gestützte Empfehlungen für die besten Dämmmaterialien zur Verbesserung thermische Effizienz und Schalldämmung.",
 
+   //  --------------------------------- Tool page ---------------------------------
+   lb_tl_Title: "Chats",
+   btn_tl_Close: "Schließen",
+   btn_tl_NewChat: "Neuer Chat",
+ 
+   lb_tlF_ImageUpload: "Ziehen Sie es per Drag & Drop oder klicken Sie hier, um ein Bild hochzuladen",
+   lb_tlF_Prompt: "Zusätzliche Aufforderung",
+ 
+   lb_tlF_RemoveImage: "Entferne Bild",
+   btn_tlF_Submit: "Einreichen",
+  
   // --------------------------------- How To Use page ---------------------------------
   lb_htu_Title: "Wie benutzt man!",
   lb_htu_Description: "Auf dieser Seite finden Sie eine einfache Anleitung, wie Sie unsere KI nutzen, um Ihre Ziele effizient zu erreichen. Befolgen Sie die folgenden Schritte, um zu beginnen:",
@@ -121,6 +132,8 @@ const de: Translations = {
   btn_ft_Donations: "Spenden",
   btn_ft_Contacts: "Kontakte",
 
+  // --------------------------------- Spinner ---------------------------------
+  lb_sp_Title: "Wird geladen..."
 };
 
 export { de };

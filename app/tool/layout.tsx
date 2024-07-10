@@ -9,7 +9,11 @@ import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
 import { auth } from '@/services/firebase';
 
+import { useLocalization } from '@/lang/language';
+
 export default function Layout({ children }: React.PropsWithChildren) {
+  const loc = useLocalization();
+
   const router = useRouter();
   const params = useParams();
 
@@ -70,15 +74,15 @@ export default function Layout({ children }: React.PropsWithChildren) {
               className='absolute top-2 right-4 hover:bg-green-200 bg-[#c5ece0] text-black p-2 border-2 border-gray-400 rounded-lg'
               onClick={() => setIsSidebarOpen(false)}
             >
-              Close
+              {loc('btn_tl_Close')}
             </button>
-            <h2 className='text-xl font-semibold mb-4'>Chats</h2>
+            <h2 className='text-xl font-semibold mb-4'>{loc('lb_tl_Title')}</h2>
 
             <button
               className='w-full mt-4 py-2 px-4 hover:bg-green-200 bg-[#c5ece0] text-black p-2 border-2 border-gray-400 rounded-lg'
               onClick={() => router.push('/tool')}
             >
-              New Chat
+              {loc('btn_tl_NewChat')}
             </button>
 
             <ul>

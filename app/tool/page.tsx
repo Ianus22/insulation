@@ -10,7 +10,11 @@ import { useRouter } from 'next/navigation';
 import { auth } from '@/services/firebase';
 import Image from 'next/image';
 
+import { useLocalization } from '@/lang/language';
+
 export default function CreateThread() {
+  const loc = useLocalization();
+
   const toolData = useContext(ToolDataContext);
   const router = useRouter();
 
@@ -223,11 +227,11 @@ export default function CreateThread() {
         ) : (
           <Image src={imagePreviewUrl} alt='Uploaded Image' height={120} width={120} />
         )}
-        <p className='text-gray-400 mt-4'>Drag and drop or click here to upload image</p>
+        <p className='text-gray-400 mt-4'>{loc('lb_tlF_ImageUpload')}</p>
         {errorMessage && <div className='mt-4 p-3 bg-red-100 text-red-600 rounded'>{errorMessage}</div>}
         {image && (
           <button className='mt-4 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-700' onClick={removeImage}>
-            Remove Image
+            {loc('lb_tlF_RemoveImage')}
           </button>
         )}
       </div>
@@ -256,7 +260,7 @@ export default function CreateThread() {
         }`}
         onClick={submit}
       >
-        Submit
+        {loc('btn_tlF_Submit')}
       </button>
     </div>
   );
