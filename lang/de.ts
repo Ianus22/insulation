@@ -130,6 +130,7 @@ const de: Translations = {
 
   btn_ft_HowToUse: "Wie benutzt man",
   btn_ft_Donations: "Spenden",
+  btn_ft_Subscriptions: "Abonnements",
   btn_ft_Contacts: "Kontakte",
 
   // --------------------------------- Spinner ---------------------------------

@@ -127,6 +127,7 @@ const en = {
 
   btn_ft_HowToUse: "How To Use",
   btn_ft_Donations: "Donations",
+  btn_ft_Subscriptions: "Subscriptions",
   btn_ft_Contacts: "Contacts",
 
   // --------------------------------- Spinner ---------------------------------
