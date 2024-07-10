@@ -8,6 +8,9 @@ import { useParams } from 'next/navigation';
 import { auth } from '@/services/firebase';
 import { FaMicrophone } from 'react-icons/fa6';
 import { APITranscribeAudio } from '@/frontend-api/whisper';
+import Image from 'next/image';
+import Spinner from '@/components/ui/Spinner';
+
 export default function ChatThread() {
   const toolData = useContext(ToolDataContext);
   const { id: chatId }: { id: string } = useParams();
@@ -18,10 +21,18 @@ export default function ChatThread() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [chatSpinner, setChatSpinner] = useState(true);
+  const [imageSpinner, setImageSpinner] = useState(true);
+
   useEffect(() => {
+    setChatSpinner(true);
     auth.authStateReady().then(() => {
       if (toolData.transferredChat?.id === chatId || auth.currentUser == null) return;
-      APIGetThread(auth.currentUser, chatId).then(setChatData);
+
+      APIGetThread(auth.currentUser, chatId).then(x => {
+        setChatData(x);
+        setChatSpinner(false);
+      });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId]);
@@ -103,44 +114,52 @@ export default function ChatThread() {
         toolData.isSidebarOpen ? 'md:ml-64' : 'w-full p-6 mx-auto'
       }`}`}
     >
-      <div className='border border-gray-200 overflow-y-scroll h-[45rem]  mx-auto p-8 rounded-lg shadow-md ml-auto mb-4'>
-        <div className='ml-auto md:ml-auto'>
-          <div className='flex flex-col space-y-4 items-end'>
-            <div className='relative'>
-              <img
-                src={imageUrl}
-                alt='input image'
-                width={180}
-                height={150}
-                className='rounded-lg shadow-lg border border-black w-24 md:w-52'
-              />
+      {chatSpinner ? (
+        <Spinner className='w-full h-full' />
+      ) : (
+        <>
+          <div className='ml-auto md:ml-auto mix-blend-color-burn'>
+            <div className='flex flex-col space-y-4 items-end'>
+              <div className='relative'>
+                <img
+                  src={imageUrl}
+                  alt='input image'
+                  width={180}
+                  height={150}
+                  className='rounded-lg shadow-lg border border-black w-24 md:w-52'
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className='ml-auto md:ml-auto'>
-          {chatData?.texts.map((x, i) => (
-            <div key={i}>
-              {i % 2 == 0 && (
-                <div className='flex flex-col space-y-4 items-end mb-5 mt-5'>
-                  <div className='bg-[#C5ECE0] p-2 md:p-4 rounded-s-xl rounded-se-xl w-8/12 border border-black'>
-                    <h1>{x}</h1>
+
+          <div className='ml-auto md:ml-auto'>
+            {chatData?.texts.map((x, i) => (
+              <div key={i}>
+                {i % 2 == 0 && (
+                  <div className='flex flex-col space-y-4 items-end mb-5 mt-5'>
+                    <div className='bg-[#c5ece0] p-2 md:p-4 rounded-s-xl rounded-se-xl w-8/12 border border-black'>
+                      <h1>{x}</h1>
+                    </div>
                   </div>
-                </div>
-              )}
-              {i % 2 == 1 && (
-                <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
-                  <ReactMarkdown>{x}</ReactMarkdown>
-                </div>
-              )}
-            </div>
-          ))}
-          {response.length > 0 && (
-            <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
-              <ReactMarkdown>{response}</ReactMarkdown>
-            </div>
-          )}
-        </div>
-      </div>
+                )}
+
+                {i % 2 == 1 && (
+                  <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
+                    <ReactMarkdown>{x}</ReactMarkdown>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {response.length > 0 && (
+              <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
+                <ReactMarkdown>{response}</ReactMarkdown>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
       <div className='flex mt-auto space-x-2 w-full items-end'>
         <input
           value={prompt}
