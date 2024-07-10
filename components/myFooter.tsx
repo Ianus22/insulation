@@ -29,6 +29,9 @@ const Footer = () => {
           <a href='/donation' className='block hover:underline'>
             {loc('btn_ft_Donations')}
           </a>
+          <a href='/pricing' className='block hover:underline'>
+            Subscription
+          </a>
           <a href='/contact' className='block hover:underline'>
             {loc('btn_ft_Contacts')}
           </a>
@@ -120,4 +123,3 @@ function YoutubeIcon(props: any) {
 }
 
 export default Footer;
-

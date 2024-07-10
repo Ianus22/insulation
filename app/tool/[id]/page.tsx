@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { APIGetThread, APIRunThread, ThreadData } from '@/frontend-api/thread';
@@ -6,6 +7,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { ToolDataContext } from '../toolData';
 import { useParams } from 'next/navigation';
 import { auth } from '@/services/firebase';
+import Image from 'next/image';
 
 export default function ChatThread() {
   const toolData = useContext(ToolDataContext);
@@ -23,6 +25,7 @@ export default function ChatThread() {
 
       APIGetThread(auth.currentUser, chatId).then(setChatData);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId]);
 
   useEffect(() => {
@@ -36,6 +39,7 @@ export default function ChatThread() {
       imageId: '',
       texts: [chat.prompt]
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toolData.transferredChat]);
 
   const imageUrl = useMemo(
@@ -43,6 +47,7 @@ export default function ChatThread() {
       toolData.transferredChat?.id === chatId
         ? toolData.transferredChat.imagePreviewUrl
         : `/api/thread/image/${chatData?.imageId}`,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [toolData.transferredChat, chatData]
   );
 
@@ -71,6 +76,7 @@ export default function ChatThread() {
       imageId: data?.imageId ?? '',
       texts: [...(data?.texts ?? []), response]
     }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGenerating]);
 
   return (
@@ -84,7 +90,7 @@ export default function ChatThread() {
           <div className='relative'>
             <img
               src={imageUrl}
-              alt='placeholder'
+              alt='input image'
               width={180}
               height={150}
               className='rounded-lg shadow-lg border border-black w-24 md:w-52'
@@ -133,4 +139,3 @@ export default function ChatThread() {
     </div>
   );
 }
-
