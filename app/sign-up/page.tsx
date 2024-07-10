@@ -9,12 +9,16 @@ import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import MyNavbar from '@/components/myNavbar';
 
+import { useEffect } from 'react';
+import { useLocalization } from '@/lang/language';
+
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [passwordAgain, setPasswordAgain] = useState('');
 
+  const loc = useLocalization();
   const router = useRouter();
 
   const onSignUp = async (e: React.FormEvent) => {
@@ -31,20 +35,20 @@ export default function Signup() {
   return (
     <>
       <MyNavbar />
-      <div className='flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 max-w-xl mx-auto shadow-lg mt-6 mb-10'>
+      <div className='flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 max-w-xl mx-auto shadow-lg my-6'>
         <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
           <div className='flex items-center justify-center'>
             <Image src='/images/logo1.png' alt='Logo' width={150} height={40} />
           </div>
 
-          <h2 className='mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-black'>Sign up</h2>
+          <h2 className='mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-black'>{loc('lb_sgu_Title')}</h2>
         </div>
 
         <div className='mt-10 sm:mx-auto sm:w-full sm:max-w-sm'>
           <div className='space-y-6'>
             <div>
               <label htmlFor='email' className='block text-sm font-medium leading-6 text-black'>
-                Email address
+                {loc('lb_sgu_sgi_F_Email')}
               </label>
               <div className='mt-2'>
                 <input
@@ -62,7 +66,7 @@ export default function Signup() {
             <div>
               <div className='flex items-center justify-between'>
                 <label htmlFor='password' className='block text-sm font-medium leading-6 text-black'>
-                  Password
+                  {loc('lb_sgu_sgi_F_Password')}
                 </label>
               </div>
               <div className='mt-2'>
@@ -80,7 +84,7 @@ export default function Signup() {
             <div>
               <div className='flex items-center justify-between'>
                 <label htmlFor='password' className='block text-sm font-medium leading-6 text-black'>
-                  Password Again
+                  {loc('lb_sguF_PasswordRepeat')}
                 </label>
               </div>
               <div className='mt-2'>
@@ -102,16 +106,16 @@ export default function Signup() {
                 className='flex w-full justify-center rounded-md bg-[#c5ece0] px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500'
                 onClick={onSignUp}
               >
-                Sign Up
+                {loc('btn_sgu_SignUpButton')}
               </button>
             </div>
           </div>
           <p className='text-red-500'>{error}</p>
 
           <p className='mt-10 text-center text-sm text-gray-400'>
-            Already have an account?&nbsp;
+            {loc('lb_sgu_HaveAnAccount')}&nbsp;
             <Link href='/sign-in' className='font-semibold leading-6 text-indigo-400 hover:text-indigo-300'>
-              Log in
+              {loc('lb_sgu_Ahref_LogIn')}
             </Link>
           </p>
         </div>
@@ -120,4 +124,3 @@ export default function Signup() {
     </>
   );
 }
-
