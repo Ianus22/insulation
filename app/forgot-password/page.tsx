@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Footer from '@/components/myFooter';
-import { auth } from '@/services/llm/firebase';
+import { auth } from '@/services/firebase';
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
@@ -69,3 +69,4 @@ export default function ForgotPassword() {
     </>
   );
 }
+

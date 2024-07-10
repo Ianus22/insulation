@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 const Footer = () => {
   return (
-    <footer className='bg-[#d1f2eb] text-[#5d6d7e] pt-8 mt-auto'>
+    <footer className='bg-[#d1f2eb] text-[#5d6d7e] pt-8'>
       <div className='container mx-auto flex  items-center'>
         <div className='w-full'>
           <p className='text-lg'>&copy; 2024 SmartInsulation</p>
@@ -22,6 +22,9 @@ const Footer = () => {
           </a>
           <a href='/donation' className='block hover:underline'>
             Donations
+          </a>
+          <a href='/pricing' className='block hover:underline'>
+            Subscription
           </a>
           <a href='/contact' className='block hover:underline'>
             Contact

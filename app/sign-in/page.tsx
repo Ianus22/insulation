@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Footer from '@/components/myFooter';
 import Link from 'next/link';
-import { signIn } from '@/services/llm/firebase';
+import { signIn } from '@/services/firebase';
 import MyNavbar from '@/components/myNavbar';
 
 export default function Signin() {
@@ -19,7 +19,7 @@ export default function Signin() {
     setError(null);
     try {
       const user = await signIn(email, password);
-      router.push('/');
+      router.back();
     } catch (error: any) {
       setError('Invalid email or password. Please try again.');
     }
@@ -27,7 +27,8 @@ export default function Signin() {
 
   return (
     <>
-      <div className='flex min-h-full flex-1 mt-6 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 rounded-lg shadow-lg max-w-lg mx-auto mb-10'>
+      <MyNavbar></MyNavbar>
+      <div className='flex min-h-full flex-1 mt-6 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100 rounded-lg shadow-lg max-w-lg mx-auto mb-6'>
         <div className='sm:mx-auto sm:w-full sm:max-w-sm '>
           <div className='flex items-center justify-center'>
             <Image src='/images/logo1.png' alt='Logo' width={150} height={40} />
