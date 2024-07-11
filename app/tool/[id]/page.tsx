@@ -26,8 +26,12 @@ export default function ChatThread() {
 
   useEffect(() => {
     setChatSpinner(true);
+
     auth.authStateReady().then(() => {
+      setChatSpinner(false);
+
       if (toolData.transferredChat?.id === chatId || auth.currentUser == null) return;
+      setChatSpinner(true);
 
       APIGetThread(auth.currentUser, chatId).then(x => {
         setChatData(x);
