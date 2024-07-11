@@ -214,7 +214,7 @@ export default function CreateThread() {
   const canClickButton = useMemo(() => image != null && !isValidating, [image, isValidating]);
 
   return (
-    <div className='flex flex-col items-center w-11/12 max-w-2xl mx-auto p-8 rounded-lg shadow-md ml-auto  overflow-y-auto'>
+    <div className='flex flex-col items-center w-11/12 max-w-2xl mx-auto p-8 rounded-lg shadow-md ml-auto  overflow-y-auto mt-16'>
       <input
         type='file'
         accept='image/png, image/jpeg'
@@ -272,4 +272,3 @@ export default function CreateThread() {
     </div>
   );
 }
-
