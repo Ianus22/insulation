@@ -3,6 +3,8 @@
 import { APICreateThread, APIDeleteThread, APIRunThread } from '@/frontend-api/thread';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { APITranscribeAudio } from '@/frontend-api/whisper';
+import { useGlobalState } from '@/hooks/globalState';
+import { languageState } from '@/lang/language';
 import { FaMicrophone } from 'react-icons/fa6';
 import Spinner from '@/components/ui/Spinner';
 import { ToolDataContext } from './toolData';
@@ -11,6 +13,7 @@ import { auth } from '@/services/firebase';
 import Image from 'next/image';
 
 export default function CreateThread() {
+  const language = useGlobalState(languageState);
   const toolData = useContext(ToolDataContext);
   const router = useRouter();
 
@@ -44,7 +47,11 @@ export default function CreateThread() {
     setIsValidating(true);
 
     if (prompt.trim().length == 0)
-      setPrompt('What is the best way to insulate and fireproof the area shown in the image given above?');
+      setPrompt(
+        language.value === 'en'
+          ? 'What is the best way to insulate and fireproof the area shown in the image given above?'
+          : 'Wie lässt sich der im Bild oben gezeigte Bereich am besten isolieren und feuerfest machen?'
+      );
 
     return () => reader.removeEventListener('load', onImageLoaded);
 
