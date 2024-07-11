@@ -186,7 +186,9 @@ export function MyNavbar() {
                   </NavigationMenuItem>
                 )}
                 <NavigationMenuItem>
-                  <LanguageToggle />
+                  <div className='mr-auto '>
+                    <LanguageToggle />
+                  </div>
                 </NavigationMenuItem>
               </div>
             </div>
