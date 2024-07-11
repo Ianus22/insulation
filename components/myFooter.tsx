@@ -17,7 +17,7 @@ const Footer = () => {
             <FacebookIcon className='w-6 h-6' />
             <LinkedinIcon className='w-6 h-6' />
             <YoutubeIcon className='w-6 h-6' />
-            <Link href='https://www.instagram.com/vbox7official'>
+            <Link href='https://www.instagram.com/n_krustev_'>
               <InstagramIcon className='w-6 h-6' />
             </Link>
           </div>
