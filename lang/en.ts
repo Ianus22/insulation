@@ -18,6 +18,17 @@ const en = {
 
   txt_ContentDescription: "Upload your wall image and get AI-powered recommendations for the best insulation materials to improve thermal efficiency and soundproofing.",
 
+  //  --------------------------------- Tool page ---------------------------------
+  lb_tl_Title: "Chats",
+  btn_tl_Close: "Close",
+  btn_tl_NewChat: "New chat",
+
+  lb_tlF_ImageUpload: "Drag and drop or click here to upload an image",
+  lb_tlF_Prompt: "Additional promt",
+
+  lb_tlF_RemoveImage: "Remove Image",
+  btn_tlF_Submit: "Submit",
+
   // --------------------------------- How To Use page ---------------------------------
   lb_htu_Title: "How to use!",
   lb_htu_Description: "On this page, you'll find a simple guide on how to use our AI to achieve your goals efficiently. Follow the steps below to get started:",
@@ -116,7 +127,11 @@ const en = {
 
   btn_ft_HowToUse: "How To Use",
   btn_ft_Donations: "Donations",
-  btn_ft_Contacts: "Contacts"
+  btn_ft_Subscriptions: "Subscriptions",
+  btn_ft_Contacts: "Contacts",
+
+  // --------------------------------- Spinner ---------------------------------
+  lb_sp_Title: "Loading..."
 
 } as const;
 

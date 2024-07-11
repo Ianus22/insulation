@@ -6,7 +6,8 @@ type Translations<TLangs extends string, TKeys extends string> = {
   };
 };
 
-function createLocalization<TLangs extends string, TKeys extends string, TLang extends TLangs>(
+function createLocalization<TLangs extends string, TKeys extends string, TLang extends TLangs>
+(
   translations: Translations<TLangs, TKeys>,
   defaultLang: TLang
 ) {
