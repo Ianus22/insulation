@@ -10,7 +10,11 @@ import Footer from '@/components/myFooter';
 import { auth } from '@/services/firebase';
 import Spinner from '@/components/ui/Spinner';
 
+import { useLocalization } from '@/lang/language';
+
 export default function Layout({ children }: React.PropsWithChildren) {
+  const loc = useLocalization();
+
   const router = useRouter();
   const params = useParams();
 
@@ -127,3 +131,4 @@ export default function Layout({ children }: React.PropsWithChildren) {
     </>
   );
 }
+
