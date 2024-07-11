@@ -13,7 +13,6 @@ const sketch = '/images/sketch.png';
 const placeholder = '/images/placeholder.png';
 
 export default function Home() {
-
   const loc = useLocalization();
 
   return (
@@ -31,7 +30,7 @@ export default function Home() {
             className='scale-100 md:scale-75 mb-8'
           />
         </div>
-        <div className='relative z-10 text-center'> 
+        <div className='relative z-10 text-center'>
           <h1 className='text-3xl md:text-4xl font-varta text-black mt-24'>{loc('moto')}</h1>
           <p className='mt-2 text-lg text-gray-600 mb-24'>{loc('sub_moto')}</p>
           <div className=''>
@@ -64,9 +63,7 @@ export default function Home() {
           <div className='text-4xl text-center text-gray-500'>=</div>
 
           <div className='flex flex-col items-center bg-[#C5ECE0] rounded-lg px-8 py-2 shadow-md max-w-sm'>
-            <h2 className='text-xs md:text-base text-gray-800 font-medium text-center'>
-              {loc('txt_Output')}
-            </h2>
+            <h2 className='text-xs md:text-base text-gray-800 font-medium text-center'>{loc('txt_Output')}</h2>
             <p className='text-gray-600 mt-2 text-center text-sm md:text-base'>{loc('lb_Output')}</p>
           </div>
         </div>
@@ -89,3 +86,4 @@ export default function Home() {
     </>
   );
 }
+

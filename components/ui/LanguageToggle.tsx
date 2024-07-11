@@ -5,12 +5,16 @@ import React, { useState, useEffect } from 'react';
 import { languageState } from '@/lang/language';
 import Image from 'next/image';
 
+// boc boc boc v surceto i v na maika ti guzeto
 const LanguageToggle: React.FC = () => {
   const language = useGlobalState(languageState);
-
   const isEnglish = language.value == 'en';
 
   const toggleLanguage = () => (language.value = isEnglish ? 'de' : 'en');
+
+  useEffect(() => {
+    language.value = (localStorage.getItem('lang') as any) ?? 'en';
+  }, []);
 
   return (
     <div
@@ -33,3 +37,4 @@ const LanguageToggle: React.FC = () => {
 };
 
 export default LanguageToggle;
+

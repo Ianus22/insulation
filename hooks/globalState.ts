@@ -11,7 +11,6 @@ function createGlobalState<T>(defaultValue: T): GlobalState<T> {
   return {
     listeners: new Set(),
     set value(newValue: T) {
-      if (value === newValue) return;
       value = newValue;
       for (const listener of this.listeners) listener();
     },
@@ -28,6 +27,11 @@ function useGlobalState<T>(state: GlobalState<T>) {
     const refresh = () => setRefresh(r => !r);
 
     state.listeners.add(refresh);
+
+    setTimeout(refresh, 1000); // Next.js skips rerendering the initial page if this is immediate
+    // If anyone makes the techinal decision to use this framework again in the future
+    // they should be burned alive
+
     return () => void state.listeners.delete(refresh);
   }, []);
 
