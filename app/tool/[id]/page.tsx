@@ -22,7 +22,7 @@ export default function ChatThread() {
   const audioChunksRef = useRef<Blob[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [chatSpinner, setChatSpinner] = useState(true);
-  const [imageSpinner, setImageSpinner] = useState(true);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setChatSpinner(true);
@@ -52,6 +52,7 @@ export default function ChatThread() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toolData.transferredChat]);
+
   const imageUrl = useMemo(
     () =>
       toolData.transferredChat?.id === chatId
@@ -60,6 +61,7 @@ export default function ChatThread() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [toolData.transferredChat, chatData]
   );
+
   const submit = async () => {
     if (isGenerating || auth.currentUser == null) return;
     setIsGenerating(true);
@@ -71,6 +73,7 @@ export default function ChatThread() {
     await APIRunThread(auth.currentUser, chatId, prompt, text => setResponse(res => res + text));
     setIsGenerating(false);
   };
+
   useEffect(() => {
     if (isGenerating) return;
     setResponse('');
@@ -80,6 +83,13 @@ export default function ChatThread() {
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGenerating]);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatData, response]);
+
   const handleAudioStart = () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       alert('Audio recording is not supported in your browser.');
@@ -107,66 +117,70 @@ export default function ChatThread() {
       setIsRecording(true);
     });
   };
+
   const handleAudioStop = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
   };
+
   return (
     <div
       className={`flex flex-col items-center ${`w-10/12  ${
         toolData.isSidebarOpen ? 'md:ml-64' : 'w-full p-6 mx-auto'
       }`}`}
     >
-      {chatSpinner ? (
-        <div className=' min-h-[768px]'>
+      <div
+        ref={chatContainerRef}
+        className='border border-gray-200 overflow-y-scroll h-[45rem] mx-auto p-8 rounded-lg shadow-md ml-auto mb-4'
+      >
+        {chatSpinner ? (
           <Spinner className='w-full h-full' />
-        </div>
-      ) : (
-        <>
-          <div className='ml-auto md:ml-auto'>
-            <div className='flex flex-col space-y-4 items-end'>
-              <div className='relative'>
-                <img
-                  src={imageUrl}
-                  alt='input image'
-                  width={180}
-                  height={150}
-                  className='rounded-s-xl rounded-se-xl shadow-lg border border-black w-24 md:w-52'
-                />
+        ) : (
+          <>
+            <div className='ml-auto md:ml-auto mix-blend-color-burn'>
+              <div className='flex flex-col space-y-4 items-end'>
+                <div className='relative'>
+                  <img
+                    src={imageUrl}
+                    alt='input image'
+                    width={180}
+                    height={150}
+                    className='rounded-lg shadow-lg border border-black w-24 md:w-52'
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className='ml-auto md:ml-auto'>
-            {chatData?.texts.map((x, i) => (
-              <div key={i}>
-                {i % 2 == 0 && (
-                  <div className='flex flex-col space-y-4 items-end mb-5 mt-5'>
-                    <div className='bg-[#c5ece0] p-2 md:p-4 rounded-s-xl rounded-se-xl w-8/12 border border-black'>
-                      <h1>{x}</h1>
+            <div className='ml-auto md:ml-auto'>
+              {chatData?.texts.map((x, i) => (
+                <div key={i}>
+                  {i % 2 === 0 && (
+                    <div className='flex flex-col space-y-4 items-end mb-5 mt-5'>
+                      <div className='bg-[#c5ece0] p-2 md:p-4 rounded-s-xl rounded-se-xl w-8/12 border border-black'>
+                        <h1>{x}</h1>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {i % 2 == 1 && (
-                  <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
-                    <ReactMarkdown>{x}</ReactMarkdown>
-                  </div>
-                )}
-              </div>
-            ))}
+                  {i % 2 === 1 && (
+                    <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
+                      <ReactMarkdown>{x}</ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+              ))}
 
-            {response.length > 0 && (
-              <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
-                <ReactMarkdown>{response}</ReactMarkdown>
-              </div>
-            )}
-          </div>
-        </>
-      )}
-
+              {response.length > 0 && (
+                <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
+                  <ReactMarkdown>{response}</ReactMarkdown>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
       <div className='flex mt-auto space-x-2 w-full items-end'>
         <input
           value={prompt}
