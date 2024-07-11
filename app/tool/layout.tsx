@@ -2,15 +2,21 @@
 
 import { ToolData, ToolDataContext, TransferredChat } from './toolData';
 import { HiOutlineChatBubbleBottomCenterText } from 'react-icons/hi2';
-import { APIListThreads } from '@/frontend-api/thread';
+import { APIDeleteThread, APIListThreads } from '@/frontend-api/thread';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
 import { auth } from '@/services/firebase';
 import Spinner from '@/components/ui/Spinner';
+import { getAuth } from 'firebase/auth';
+
+import { useLocalization } from '@/lang/language';
+import { APIGetSubscriptionStatus } from '@/frontend-api/stripe';
 
 export default function Layout({ children }: React.PropsWithChildren) {
+  const loc = useLocalization();
+
   const router = useRouter();
   const params = useParams();
 
@@ -19,6 +25,8 @@ export default function Layout({ children }: React.PropsWithChildren) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [pageSpinner, setPageSpinner] = useState(true);
   const [historySpinner, setHistorySpinner] = useState(true);
+  const [deleteSpinners, setDelelteSpinners] = useState<string[]>([]);
+  const [canDelete, setCanDelete] = useState<boolean>(false);
 
   const toolData = useMemo<ToolData>(
     () => ({
@@ -46,6 +54,12 @@ export default function Layout({ children }: React.PropsWithChildren) {
         setPageSpinner(false);
 
         setHistorySpinner(true);
+
+        APIGetSubscriptionStatus(auth.currentUser!).then(x => {
+          if (x == null) setCanDelete(false);
+          else setCanDelete(true);
+        });
+
         setChats(await APIListThreads(auth.currentUser));
         setHistorySpinner(false);
       })
@@ -61,6 +75,17 @@ export default function Layout({ children }: React.PropsWithChildren) {
         .map(([id]) => id),
     [chats]
   );
+
+  const onChatDeleate = async (chatId: string) => {
+    setDelelteSpinners(deleteSpinners => [...deleteSpinners, chatId]);
+
+    const user = getAuth().currentUser!;
+    await APIDeleteThread(user, chatId);
+    router.push('/tool');
+    setChats(await APIListThreads(user));
+
+    setDelelteSpinners(deleteSpinners => deleteSpinners.filter(id => id != chatId));
+  };
 
   return (
     <>
@@ -104,15 +129,34 @@ export default function Layout({ children }: React.PropsWithChildren) {
                     </button>
                     <ul>
                       {chatNames.map(chatId => (
-                        <button
-                          key={chatId}
-                          className={`w-full mt-4 py-2 px-4 hover:bg-green-200 bg-gray-${
-                            chatId === params.id ? 200 : 100
-                          } text-black p-2 border-2 border-gray-400 rounded-lg`}
-                          onClick={() => router.push(`/tool/${chatId}`)}
-                        >
-                          {chats[chatId]}
-                        </button>
+                        <div key={chatId} className='flex justify-even border-2 border-gray-400 rounded-lg mt-4'>
+                          <button
+                            className={`${
+                              canDelete ? 'w-8/12 mr-5' : 'w-full mr-1'
+                            } my-1 ml-1 rounded-lg hover:bg-green-200 bg-gray-${
+                              chatId === params.id ? 200 : 100
+                            } text-black p-2 `}
+                            onClick={() => router.push(`/tool/${chatId}`)}
+                          >
+                            {chats[chatId]}
+                          </button>
+                          {canDelete ? (
+                            <>
+                              {deleteSpinners.indexOf(chatId) != -1 ? (
+                                <Spinner />
+                              ) : (
+                                <button
+                                  className='w-3/12 my-1 mr-1 bg-red-500 rounded-lg'
+                                  onClick={() => onChatDeleate(chatId)}
+                                >
+                                  Del
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                        </div>
                       ))}
                     </ul>
                   </>
