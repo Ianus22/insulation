@@ -26,8 +26,12 @@ export default function ChatThread() {
 
   useEffect(() => {
     setChatSpinner(true);
+
     auth.authStateReady().then(() => {
+      setChatSpinner(false);
+
       if (toolData.transferredChat?.id === chatId || auth.currentUser == null) return;
+      setChatSpinner(true);
 
       APIGetThread(auth.currentUser, chatId).then(x => {
         setChatData(x);
@@ -36,6 +40,7 @@ export default function ChatThread() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId]);
+
   useEffect(() => {
     const chat = toolData.transferredChat;
     if (chat == null || chat.id !== chatId) return;
@@ -115,10 +120,12 @@ export default function ChatThread() {
       }`}`}
     >
       {chatSpinner ? (
-        <Spinner className='w-full h-full' />
+        <div className=' min-h-[768px]'>
+          <Spinner className='w-full h-full' />
+        </div>
       ) : (
         <>
-          <div className='ml-auto md:ml-auto mix-blend-color-burn'>
+          <div className='ml-auto md:ml-auto'>
             <div className='flex flex-col space-y-4 items-end'>
               <div className='relative'>
                 <img
@@ -126,7 +133,7 @@ export default function ChatThread() {
                   alt='input image'
                   width={180}
                   height={150}
-                  className='rounded-lg shadow-lg border border-black w-24 md:w-52'
+                  className='rounded-s-xl rounded-se-xl shadow-lg border border-black w-24 md:w-52'
                 />
               </div>
             </div>
