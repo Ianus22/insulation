@@ -11,7 +11,7 @@ const de: Translations = {
 
   btn_TryItOut: "Versuch es!",
 
-  lb_SeeItClearly: "Sehen Sie es deutlich!",
+  lb_SeeItClearly: "Es klar sehen!",
   lb_ImgInputExample: "Beispielbildeingabe",
 
   txt_AdditionalPromtExample: "Ich benötige Vorschläge zur Verbesserung der Thermik und Schalldämmung",
@@ -34,7 +34,7 @@ const de: Translations = {
    btn_tlF_Submit: "Einreichen",
   
   // --------------------------------- How To Use page ---------------------------------
-  lb_htu_Title: "Wie benutzt man!",
+  lb_htu_Title: "Anleitung!",
   lb_htu_Description: "Auf dieser Seite finden Sie eine einfache Anleitung, wie Sie unsere KI nutzen, um Ihre Ziele effizient zu erreichen. Befolgen Sie die folgenden Schritte, um zu beginnen:",
 
   lb_htu_step1_Title: "Schritt 1: Bild hochladen",
@@ -128,7 +128,7 @@ const de: Translations = {
   // --------------------------------- Footer ---------------------------------
   lb_ft_WebLogo: "2024 SmartInsulation",
 
-  btn_ft_HowToUse: "Wie benutzt man",
+  btn_ft_HowToUse: "Anleitung",
   btn_ft_Donations: "Spenden",
   btn_ft_Subscriptions: "Abonnements",
   btn_ft_Contacts: "Kontakte",
