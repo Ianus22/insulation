@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserIdFromRequest } from '@/services/auth';
 import { deleteThread } from '@/services/llm/thread';
 import { databaseAdmin } from '@/services/firebaseAdmin';
+import { checkSubscription, getCustomerIdFromUserId } from '@/services/stripeAdmin';
 
 export async function DELETE(req: NextRequest) {
   let data: any = null;
@@ -16,6 +17,12 @@ export async function DELETE(req: NextRequest) {
 
   if (userId == null) return new Response('Unauthorized', { status: 401 });
 
+  const customerId = await getCustomerIdFromUserId(userId);
+  const subscription = await checkSubscription(customerId);
+  if (subscription == null) {
+    return new NextResponse('Unauthorized', { status: 401 });
+  }
+
   const ref = databaseAdmin.ref(`/Users/${userId}/Chats/${data.threadId}`);
 
   if ((await (await ref.get()).val()) == null) return new Response('Unauthorized', { status: 401 });
@@ -26,4 +33,3 @@ export async function DELETE(req: NextRequest) {
 
   return new NextResponse();
 }
-

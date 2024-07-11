@@ -2,13 +2,14 @@
 
 import { ToolData, ToolDataContext, TransferredChat } from './toolData';
 import { HiOutlineChatBubbleBottomCenterText } from 'react-icons/hi2';
-import { APIListThreads } from '@/frontend-api/thread';
+import { APIDeleteThread, APIListThreads } from '@/frontend-api/thread';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import MyNavbar from '@/components/myNavbar';
 import Footer from '@/components/myFooter';
 import { auth } from '@/services/firebase';
 import Spinner from '@/components/ui/Spinner';
+import { getAuth } from 'firebase/auth';
 
 export default function Layout({ children }: React.PropsWithChildren) {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [pageSpinner, setPageSpinner] = useState(true);
   const [historySpinner, setHistorySpinner] = useState(true);
+  const [deleteSpinners, setDelelteSpinners] = useState<string[]>([]);
 
   const toolData = useMemo<ToolData>(
     () => ({
@@ -62,6 +64,17 @@ export default function Layout({ children }: React.PropsWithChildren) {
     [chats]
   );
 
+  const onChatDeleate = async (chatId: string) => {
+    setDelelteSpinners(deleteSpinners => [...deleteSpinners, chatId]);
+
+    const user = getAuth().currentUser!;
+    await APIDeleteThread(user, chatId);
+    router.push('/tool');
+    setChats(await APIListThreads(user));
+
+    setDelelteSpinners(deleteSpinners => deleteSpinners.filter(id => id != chatId));
+  };
+
   return (
     <>
       <MyNavbar />
@@ -104,15 +117,26 @@ export default function Layout({ children }: React.PropsWithChildren) {
                     </button>
                     <ul>
                       {chatNames.map(chatId => (
-                        <button
-                          key={chatId}
-                          className={`w-full mt-4 py-2 px-4 hover:bg-green-200 bg-gray-${
-                            chatId === params.id ? 200 : 100
-                          } text-black p-2 border-2 border-gray-400 rounded-lg`}
-                          onClick={() => router.push(`/tool/${chatId}`)}
-                        >
-                          {chats[chatId]}
-                        </button>
+                        <div key={chatId} className='flex justify-even'>
+                          <button
+                            className={`w-8/12 mr-5 mt-4 py-2 px-4 hover:bg-green-200 bg-gray-${
+                              chatId === params.id ? 200 : 100
+                            } text-black p-2 border-2 border-gray-400 rounded-lg`}
+                            onClick={() => router.push(`/tool/${chatId}`)}
+                          >
+                            {chats[chatId]}
+                          </button>
+                          {deleteSpinners.indexOf(chatId) != -1 ? (
+                            <Spinner />
+                          ) : (
+                            <button
+                              className='w-3/12 py-2 mt-4 bg-red-500 rounded-lg'
+                              onClick={() => onChatDeleate(chatId)}
+                            >
+                              Del
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </ul>
                   </>
