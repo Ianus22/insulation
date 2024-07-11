@@ -157,15 +157,15 @@ export default function ChatThread() {
               {chatData?.texts.map((x, i) => (
                 <div key={i}>
                   {i % 2 === 0 && (
-                    <div className='flex flex-col space-y-4 items-end mb-5 mt-5'>
-                      <div className='bg-[#c5ece0] p-2 md:p-4 rounded-s-xl rounded-se-xl w-8/12 border border-black'>
+                    <div className='flex flex-col space-y-4 items-end mb-5 mt-5 '>
+                      <div className='bg-[#c5ece0] p-2 md:p-4 rounded-s-xl rounded-se-xl max-w-sm border border-black ml-auto items-end text-right'>
                         <h1>{x}</h1>
                       </div>
                     </div>
                   )}
 
                   {i % 2 === 1 && (
-                    <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
+                    <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 md:w-8/12'>
                       <ReactMarkdown>{x}</ReactMarkdown>
                     </div>
                   )}
@@ -173,7 +173,7 @@ export default function ChatThread() {
               ))}
 
               {response.length > 0 && (
-                <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 w-8/12'>
+                <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 max-w-sm'>
                   <ReactMarkdown>{response}</ReactMarkdown>
                 </div>
               )}
