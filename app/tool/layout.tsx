@@ -12,6 +12,7 @@ import Spinner from '@/components/ui/Spinner';
 import { getAuth } from 'firebase/auth';
 
 import { useLocalization } from '@/lang/language';
+import { APIGetSubscriptionStatus } from '@/frontend-api/stripe';
 
 export default function Layout({ children }: React.PropsWithChildren) {
   const loc = useLocalization();
@@ -25,6 +26,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
   const [pageSpinner, setPageSpinner] = useState(true);
   const [historySpinner, setHistorySpinner] = useState(true);
   const [deleteSpinners, setDelelteSpinners] = useState<string[]>([]);
+  const [canDelete, setCanDelete] = useState<boolean>(false);
 
   const toolData = useMemo<ToolData>(
     () => ({
@@ -52,6 +54,12 @@ export default function Layout({ children }: React.PropsWithChildren) {
         setPageSpinner(false);
 
         setHistorySpinner(true);
+
+        APIGetSubscriptionStatus(auth.currentUser!).then(x => {
+          if (x == null) setCanDelete(false);
+          else setCanDelete(true);
+        });
+
         setChats(await APIListThreads(auth.currentUser));
         setHistorySpinner(false);
       })
@@ -121,24 +129,32 @@ export default function Layout({ children }: React.PropsWithChildren) {
                     </button>
                     <ul>
                       {chatNames.map(chatId => (
-                        <div key={chatId} className='flex justify-even'>
+                        <div key={chatId} className='flex justify-even border-2 border-gray-400 rounded-lg mt-4'>
                           <button
-                            className={`w-8/12 mr-5 mt-4 py-2 px-4 hover:bg-green-200 bg-gray-${
+                            className={`${
+                              canDelete ? 'w-8/12 mr-5' : 'w-full mr-1'
+                            } my-1 ml-1 rounded-lg hover:bg-green-200 bg-gray-${
                               chatId === params.id ? 200 : 100
-                            } text-black p-2 border-2 border-gray-400 rounded-lg`}
+                            } text-black p-2 `}
                             onClick={() => router.push(`/tool/${chatId}`)}
                           >
                             {chats[chatId]}
                           </button>
-                          {deleteSpinners.indexOf(chatId) != -1 ? (
-                            <Spinner />
+                          {canDelete ? (
+                            <>
+                              {deleteSpinners.indexOf(chatId) != -1 ? (
+                                <Spinner />
+                              ) : (
+                                <button
+                                  className='w-3/12 my-1 mr-1 bg-red-500 rounded-lg'
+                                  onClick={() => onChatDeleate(chatId)}
+                                >
+                                  Del
+                                </button>
+                              )}
+                            </>
                           ) : (
-                            <button
-                              className='w-3/12 py-2 mt-4 bg-red-500 rounded-lg'
-                              onClick={() => onChatDeleate(chatId)}
-                            >
-                              Del
-                            </button>
+                            <></>
                           )}
                         </div>
                       ))}
@@ -155,4 +171,3 @@ export default function Layout({ children }: React.PropsWithChildren) {
     </>
   );
 }
-
