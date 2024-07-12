@@ -105,17 +105,17 @@ export default function Layout({ children }: React.PropsWithChildren) {
       <MyNavbar />
       <div className='relative flex flex-col items-center justify-center h-1/2'>
         {pageSpinner ? (
-          <div className='w-screen h-screen grid place-items-center'>
+          <div className='w-screen h-screen grid place-items-center '>
             <Spinner />
           </div>
         ) : (
           <>
-            <div className='absolute top-4 left-4'>
+            <div className='absolute top-4 left-4 z-10'>
               <button onClick={() => setIsSidebarOpen(true)} className='text-gray-700 focus:outline-none'>
                 <HiOutlineChatBubbleBottomCenterText className='text-5xl text-[#c5ece0]' />
               </button>
             </div>
-            <div className='flex w-full my-20'>
+            <div className={`flex w-full mb-6 ${isSidebarOpen ? '' : ''}`}>
               <div
                 className={`absolute top-0 left-0 h-full bg-gray-100 p-4 transition-transform transform border border-[#c5ece0] rounded-lg ${
                   isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -162,7 +162,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
                                   className='w-3/12 my-1 mr-1 bg-red-500 rounded-lg'
                                   onClick={() => onChatDeleate(chatId)}
                                 >
-                                  Del
+                                  X
                                 </button>
                               )}
                             </>

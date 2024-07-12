@@ -104,11 +104,7 @@ export default function ChatThread() {
   };
 
   return (
-    <div
-      className={`flex flex-col items-center ${`w-10/12  ${
-        toolData.isSidebarOpen ? 'md:ml-64' : 'w-full p-6 mx-auto'
-      }`}`}
-    >
+    <div className={`flex flex-col items-center ${` w-full ${toolData.isSidebarOpen ? 'md:ml-64' : ' p-1 mx-auto'}`}`}>
       <div
         ref={chatContainerRef}
         className='border border-gray-200 overflow-y-scroll h-[45rem] mx-auto p-8 rounded-lg shadow-md ml-auto mb-4'
@@ -117,7 +113,7 @@ export default function ChatThread() {
           <Spinner className='w-full h-full' />
         ) : (
           <>
-            <div className='ml-auto md:ml-auto mix-blend-color-burn'>
+            <div className='ml-auto  mix-blend-color-burn'>
               <div className='flex flex-col space-y-4 items-end'>
                 <div className='relative'>
                   <img
@@ -131,7 +127,7 @@ export default function ChatThread() {
               </div>
             </div>
 
-            <div className='ml-auto md:ml-auto'>
+            <div className='ml-8'>
               {chatData?.texts.map((x, i) => (
                 <div key={i}>
                   {i % 2 === 0 && (
@@ -151,7 +147,7 @@ export default function ChatThread() {
               ))}
 
               {response.length > 0 && (
-                <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black mb-5 mt-5 max-w-sm'>
+                <div className='bg-gray-200 p-2 md:p-4 rounded-ss-xl rounded-e-xl border border-black my-5 max-w-sm'>
                   <ReactMarkdown>{response}</ReactMarkdown>
                 </div>
               )}
@@ -159,7 +155,7 @@ export default function ChatThread() {
           </>
         )}
       </div>
-      <div className='flex mt-auto space-x-2 w-full items-end'>
+      <div className='flex mt-auto space-x-2 w-full items-end max-w-full'>
         <input
           value={prompt}
           type='text'

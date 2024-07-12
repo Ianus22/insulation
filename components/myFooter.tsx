@@ -13,14 +13,6 @@ const Footer = () => {
       <div className='container mx-auto flex  items-center'>
         <div className='w-full'>
           <p className='text-lg'>&copy; {loc('lb_ft_WebLogo')}</p>
-          <div className='flex space-x-4 mt-2'>
-            <FacebookIcon className='w-6 h-6' />
-            <LinkedinIcon className='w-6 h-6' />
-            <YoutubeIcon className='w-6 h-6' />
-            <Link href='https://www.instagram.com/n_krustev_'>
-              <InstagramIcon className='w-6 h-6' />
-            </Link>
-          </div>
         </div>
         <div className='space-y-2 md:mr-12 mb-4 p-2 text-right w-full'>
           <Link href='/how-to-use' className='block hover:underline'>
@@ -30,7 +22,7 @@ const Footer = () => {
             {loc('btn_ft_Donations')}
           </Link>
           <Link href='/pricing' className='block hover:underline'>
-            Subscription
+            {loc('btn_ft_Subscriptions')}
           </Link>
           <Link href='/contact' className='block hover:underline'>
             {loc('btn_ft_Contacts')}
