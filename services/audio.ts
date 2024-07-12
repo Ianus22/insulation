@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import RecordRTC from 'recordrtc';
 
 function useAudioRecorder() {
   const disconnectRef = useRef((() => {}) as () => Promise<Blob>);
@@ -7,6 +6,8 @@ function useAudioRecorder() {
 
   return {
     start: async () => {
+      const RecordRTC = (await import('recordrtc')).default;
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true
       });
