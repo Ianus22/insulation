@@ -3,7 +3,6 @@
 import { APICreateThread, APIDeleteThread, APIRunThread } from '@/frontend-api/thread';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { APITranscribeAudio } from '@/frontend-api/whisper';
-import { useGlobalState } from '@/hooks/globalState';
 import { languageState } from '@/lang/language';
 import { FaMicrophone } from 'react-icons/fa6';
 import Spinner from '@/components/ui/Spinner';
@@ -13,6 +12,8 @@ import { auth } from '@/services/firebase';
 import Image from 'next/image';
 
 import { useLocalization } from '@/lang/language';
+import { useGlobalState } from '@/hooks/globalState';
+import { useAudioRecorder } from '@/services/audio';
 
 export default function CreateThread() {
   const loc = useLocalization();
@@ -28,10 +29,9 @@ export default function CreateThread() {
   const [image, setImage] = useState<File | null>(null);
   const [prompt, setPrompt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [isRecording, setIsRecording] = useState(false);
   const selectorRef = useRef<HTMLInputElement | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+
+  const recorder = useAudioRecorder();
 
   useEffect(() => {
     if (image == null) {
@@ -151,54 +151,19 @@ export default function CreateThread() {
     });
   };
 
-  const handleAudioStart = () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Audio recording is not supported in your browser.');
+  const handleAudioButton = async () => {
+    if (recorder.isRecording) {
+      const audioBlob = await recorder.stop();
+
+      setIsValidating(true);
+      const transcribedText = await APITranscribeAudio(audioBlob);
+      setPrompt(prev => `${prev} ${transcribedText}`);
+      setIsValidating(false);
+
       return;
     }
 
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = event => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        audioChunksRef.current = [];
-        try {
-          setIsValidating(true);
-          const transcribedText = await APITranscribeAudio(audioBlob);
-          setPrompt(prev => `${prev} ${transcribedText}`);
-          setIsValidating(false);
-        } catch (error) {
-          if (error instanceof Error) {
-            setErrorMessage(error.message);
-          } else {
-            setErrorMessage('An unknown error occurred');
-          }
-        }
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-    });
-  };
-
-  const handleAudioStop = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
-
-  const handleAudioButton = () => {
-    if (isRecording) handleAudioStop();
-    else handleAudioStart();
+    await recorder.start();
   };
 
   const imageBorderColor = useMemo(() => {
@@ -253,7 +218,7 @@ export default function CreateThread() {
           className='absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer'
           size={32}
           onClick={handleAudioButton}
-          style={{ color: isRecording ? '#f01e2c' : '#C5ECE0' }}
+          style={{ color: recorder.isRecording ? '#f01e2c' : '#C5ECE0' }}
         />
         {isValidating && (
           <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-75'>

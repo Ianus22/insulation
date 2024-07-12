@@ -1,6 +1,6 @@
 export const APITranscribeAudio = async (audioBlob: Blob): Promise<string> => {
   const formData = new FormData();
-  formData.append('file', audioBlob);
+  formData.append('file', audioBlob, `audio.${audioBlob.type.match(/audio\/(\w+)/)?.[1] ?? 'webm'}`);
 
   const response = await fetch('/api/whisper', {
     method: 'POST',

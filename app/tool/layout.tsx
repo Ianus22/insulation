@@ -14,6 +14,18 @@ import { getAuth } from 'firebase/auth';
 import { useLocalization } from '@/lang/language';
 import { APIGetSubscriptionStatus } from '@/frontend-api/stripe';
 
+const chatNameToNumber = (name: string) => {
+  const [_, year, month, day, __, extra] = name.match(/(\d+)-(\d+)-(\d+)( \((\d+)\))?/)!;
+
+  // prettier-ignore
+  return (
+    parseInt(year) * 1000 * 31 * 12 +
+    parseInt(month) * 1000 * 31 +
+    parseInt(day) * 1000 +
+    parseInt(extra ?? '0')
+  );
+};
+
 export default function Layout({ children }: React.PropsWithChildren) {
   const loc = useLocalization();
 
@@ -71,7 +83,8 @@ export default function Layout({ children }: React.PropsWithChildren) {
   const chatNames = useMemo(
     () =>
       Object.entries(chats)
-        .sort(([_, a], [__, b]) => a.localeCompare(b))
+        .map(([id, name]) => [id, chatNameToNumber(name)] as const)
+        .sort(([_, a], [__, b]) => b - a)
         .map(([id]) => id),
     [chats]
   );
@@ -171,3 +184,4 @@ export default function Layout({ children }: React.PropsWithChildren) {
     </>
   );
 }
+

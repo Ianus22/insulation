@@ -23,18 +23,18 @@ const Footer = () => {
           </div>
         </div>
         <div className='space-y-2 md:mr-12 mb-4 p-2 text-right w-full'>
-          <a href='/how-to-use' className='block hover:underline'>
+          <Link href='/how-to-use' className='block hover:underline'>
             {loc('btn_ft_HowToUse')}
-          </a>
-          <a href='/donation' className='block hover:underline'>
+          </Link>
+          <Link href='/donation' className='block hover:underline'>
             {loc('btn_ft_Donations')}
-          </a>
-          <a href='/pricing' className='block hover:underline'>
+          </Link>
+          <Link href='/pricing' className='block hover:underline'>
             Subscription
-          </a>
-          <a href='/contact' className='block hover:underline'>
+          </Link>
+          <Link href='/contact' className='block hover:underline'>
             {loc('btn_ft_Contacts')}
-          </a>
+          </Link>
         </div>
       </div>
     </footer>

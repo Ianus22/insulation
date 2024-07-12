@@ -10,6 +10,7 @@ import { FaMicrophone } from 'react-icons/fa6';
 import { APITranscribeAudio } from '@/frontend-api/whisper';
 import Image from 'next/image';
 import Spinner from '@/components/ui/Spinner';
+import { useAudioRecorder } from '@/services/audio';
 
 export default function ChatThread() {
   const toolData = useContext(ToolDataContext);
@@ -18,11 +19,10 @@ export default function ChatThread() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [response, setResponse] = useState('');
   const [prompt, setPrompt] = useState('');
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const [isRecording, setIsRecording] = useState(false);
   const [chatSpinner, setChatSpinner] = useState(true);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  const recorder = useAudioRecorder();
 
   useEffect(() => {
     setChatSpinner(true);
@@ -90,39 +90,17 @@ export default function ChatThread() {
     }
   }, [chatData, response]);
 
-  const handleAudioStart = () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Audio recording is not supported in your browser.');
+  const handleAudioButton = async () => {
+    if (recorder.isRecording) {
+      const audioBlob = await recorder.stop();
+
+      const transcribedText = await APITranscribeAudio(audioBlob);
+      setPrompt(prev => `${prev} ${transcribedText}`);
+
       return;
     }
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.ondataavailable = event => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        audioChunksRef.current = [];
-        try {
-          const transcribedText = await APITranscribeAudio(audioBlob);
-          setPrompt(prev => `${prev} ${transcribedText}`);
-        } catch (error) {
-          console.error('Transcription error:', error);
-        }
-      };
-      mediaRecorder.start();
-      setIsRecording(true);
-    });
-  };
 
-  const handleAudioStop = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
+    await recorder.start();
   };
 
   return (
@@ -197,10 +175,10 @@ export default function ChatThread() {
         />
         <FaMicrophone
           className={`flex right-4 transform -translate-y-1/4 cursor-pointer ${
-            isRecording ? 'text-red-500' : 'text-[#C5ECE0]'
+            recorder.isRecording ? 'text-red-500' : 'text-[#C5ECE0]'
           }`}
           size={32}
-          onClick={isRecording ? handleAudioStop : handleAudioStart}
+          onClick={handleAudioButton}
         />
         <button className='py-2 px-4 bg-[#C5ECE0] rounded-lg hover:bg-green-200 text-black' onClick={submit}>
           Send
@@ -209,3 +187,4 @@ export default function ChatThread() {
     </div>
   );
 }
+
