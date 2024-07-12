@@ -177,7 +177,7 @@ export default function ChatThread() {
           </>
         )}
       </div>
-      <div className='flex mt-auto space-x-2 w-full items-end'>
+      <div className='flex mt-auto space-x-2 w-full items-end max-w-full'>
         <input
           value={prompt}
           type='text'
